@@ -22,11 +22,16 @@ namespace _3Dsimulator
     public partial class SimulatorWindow : Window
     {
         AppState appState;
+        ObjShape objShape;
+        //WriteableBitmap bitMap = new WriteableBitmap();
+
 
         public SimulatorWindow(AppState aS)
         {
             InitializeComponent();
             appState = aS;
+            objShape = ObjReader.read(aS.FilePath);
+            int a = 3;
         }
 
 

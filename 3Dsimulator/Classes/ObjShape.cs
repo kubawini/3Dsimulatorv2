@@ -17,6 +17,8 @@ namespace _3Dsimulator.Classes
         private List<Face> faces = new List<Face>();
         public List<Face> Faces { get { return faces; } set { faces = value; } }
 
+        
+
         public void AddVertex(Vertex v)
         {
             vertices.Add(v);
@@ -31,6 +33,8 @@ namespace _3Dsimulator.Classes
         {
             faces.Add(f);
         }
+
+        
 
     }
 }

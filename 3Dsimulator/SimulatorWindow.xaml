@@ -16,8 +16,7 @@
             
         </Grid>
 
-        <Canvas Grid.Column="1"/> 
-        <!-- Add super fast bitmap -->
+        <Image Name="shapeDisplay" Grid.Column="1"/> 
 
     </Grid>
 </Window>

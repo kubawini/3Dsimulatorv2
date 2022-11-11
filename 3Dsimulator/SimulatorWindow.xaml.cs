@@ -23,16 +23,21 @@ namespace _3Dsimulator
     {
         AppState appState;
         ObjShape objShape;
-        //WriteableBitmap bitMap = new WriteableBitmap();
-
+        BitmapDrawer drawer;
 
         public SimulatorWindow(AppState aS)
         {
             InitializeComponent();
             appState = aS;
             objShape = ObjReader.read(aS.FilePath);
-            int a = 3;
+            shapeDisplay.BeginInit();
+            drawer = new BitmapDrawer(objShape, shapeDisplay);           
+            
+            drawer.FillObject();
+            //drawer.draw(new Vertex(0, 0, 5), objShape);
+
         }
+        
 
 
     }

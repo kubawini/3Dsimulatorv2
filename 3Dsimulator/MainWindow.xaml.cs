@@ -57,5 +57,10 @@ namespace _3Dsimulator
             this.Close();
             newWindow.ShowDialog();      
         }
+
+        private void sphereButton_Click(object sender, RoutedEventArgs e)
+        {
+            appState.FilePath = "../../../Resources/Sphere.obj";
+        }
     }
 }

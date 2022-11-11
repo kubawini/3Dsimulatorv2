@@ -28,13 +28,13 @@ namespace _3Dsimulator.Classes
                         {
                             if(i==1)
                             {
-                                f = new Face(result.NormalVectors[s2tiConv(scheme[1]).i3 - 1]);
+                                f = new Face();
                             }
-                            f!.AddVertex(result.Vertices[s2tiConv(scheme[1]).i1 - 1]);
-                            f.AddVertex(result.Vertices[s2tiConv(scheme[2]).i1 - 1]);
-                            f.AddVertex(result.Vertices[s2tiConv(scheme[3]).i1 - 1]); 
+                            f!.AddVertex(result.Vertices[s2tiConv(scheme[i]).i1 - 1]);
+                            result.Vertices[s2tiConv(scheme[i]).i1 - 1].normalVector = result.NormalVectors[s2tiConv(scheme[i]).i3 - 1];
                             // To add 3rd field
                         }
+                        f!.CreateEdges();
                         result.AddFace(f);
                         break;
                     default:

@@ -22,3 +22,5 @@ C:\Users\kubaw\Desktop\AntyAvastVS\3Dsimulator\3Dsimulator\obj\Debug\net6.0-wind
 C:\Users\kubaw\Desktop\AntyAvastVS\3Dsimulator\3Dsimulator\obj\Debug\net6.0-windows\SimulatorWindow.g.cs
 C:\Users\kubaw\Desktop\AntyAvastVS\3Dsimulator\3Dsimulator\obj\Debug\net6.0-windows\SimulatorWindow.baml
 C:\Users\kubaw\Desktop\AntyAvastVS\3Dsimulator\3Dsimulator\obj\Debug\net6.0-windows\GeneratedInternalTypeHelper.g.cs
+C:\Users\kubaw\Desktop\AntyAvastVS\3Dsimulator\3Dsimulator\bin\Debug\net6.0-windows\WriteableBitmapEx.Wpf.dll
+C:\Users\kubaw\Desktop\AntyAvastVS\3Dsimulator\3Dsimulator\obj\Debug\net6.0-windows\3Dsimulator.csproj.CopyComplete

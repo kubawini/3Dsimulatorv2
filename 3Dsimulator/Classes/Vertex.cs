@@ -12,9 +12,16 @@ namespace _3Dsimulator.Classes
         public double Y;
         public double Z;
 
+        public NormalVector normalVector = new NormalVector(0,0,0);
+
         public Vertex(double x, double y, double z)
         {
-            X = x; Y = y; Z = z;
+            X = Geo.x2w(x); Y = Geo.y2h(y); Z = Geo.z2p(z);
+        }
+
+        public void AddNormalVector(NormalVector nv)
+        {
+            normalVector = nv;
         }
     }
 }

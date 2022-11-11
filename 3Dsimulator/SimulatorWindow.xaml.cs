@@ -34,7 +34,7 @@ namespace _3Dsimulator
             drawer = new BitmapDrawer(objShape, shapeDisplay);           
             
             drawer.FillObject();
-            //drawer.draw(new Vertex(0, 0, 5), objShape);
+            //drawer.draw(new Vertex(0, 0, 1), objShape);
 
         }
         

@@ -21,7 +21,16 @@ namespace _3Dsimulator.Classes
         private int width;
         private int height;
 
-        //LinkedList<ETitem>[] ET;
+        public BitmapDrawer(ObjShape ls, Image im)
+        {
+            loadedShape = ls;
+            image = im;
+            bitmap = new WriteableBitmap(600, 600, 96, 96, PixelFormats.Bgr32, null);
+            image.Source = bitmap;
+            width = (int)(image.Source.Width);
+            height = (int)image.Source.Height;
+            bitmap.FillRectangle(0, 0, (int)width, (int)height, Colors.Blue);
+        }
 
         public List<ETitem>[] CreateET(Face f)
         {
@@ -38,8 +47,14 @@ namespace _3Dsimulator.Classes
             return ET;
         }
 
-        public void FillFace(Face f)
+        public void FillFace(Face f, Vertex LightSource)
         {
+            var colors = new Color[f.Vertices.Count];
+            for(int i = 0; i < f.Vertices.Count; i++)
+            {
+                colors[i] = Geo.getVertexColor(f.Vertices[i], LightSource, LoadedShape);
+            }
+
             int y = (int)f.ymin;
             var ET = CreateET(f);
             List<ETitem> AET = new List<ETitem>();
@@ -62,7 +77,24 @@ namespace _3Dsimulator.Classes
                     if (i % 2 == 1)
                     {
                         var a = 0;
-                        bitmap.DrawLine((int)prev.xmin, y, (int)el.xmin, y, Colors.Red);
+                        //bitmap.DrawLine((int)prev.xmin, y, (int)el.xmin, y, Colors.Red);
+                        for(int x = (int)prev.xmin; x <= (int)el.xmin; x++)
+                        {
+                            // Interpolation for triangle right now
+                            double mian = (f.Vertices[1].Y - f.Vertices[2].Y) * (f.Vertices[0].X - f.Vertices[2].X) +
+                                (f.Vertices[2].X - f.Vertices[1].X) * (f.Vertices[0].Y - f.Vertices[2].Y);
+                            double wv1 = ((f.Vertices[1].Y - f.Vertices[2].Y) * (x-f.Vertices[2].X) +
+                                (f.Vertices[2].X - f.Vertices[1].X) * (y - f.Vertices[2].Y)) / mian;
+                            double wv2 = ((f.Vertices[2].Y - f.Vertices[0].Y) * (x - f.Vertices[2].X) +
+                                (f.Vertices[0].X - f.Vertices[2].X) * (y - f.Vertices[2].Y)) / mian;
+                            double wv3 = 1 - wv1 - wv2;
+
+                            byte R = (byte)(wv1 * colors[0].R + wv2 * colors[1].R + wv3 * colors[2].R);
+                            byte G = (byte)(wv1 * colors[0].G + wv2 * colors[1].G + wv3 * colors[2].G);
+                            byte B = (byte)(wv1 * colors[0].B + wv2 * colors[1].B + wv3 * colors[2].B);
+
+                            bitmap.SetPixel(x, y, Color.FromRgb(R, G, B));
+                        }
                     }
                     prev = el;
                     i++;
@@ -86,19 +118,7 @@ namespace _3Dsimulator.Classes
         public void FillObject()
         {
             foreach (var f in loadedShape.Faces)
-                FillFace(f);
-        }
-
-
-        public BitmapDrawer(ObjShape ls, Image im)
-        {
-            loadedShape = ls;
-            image = im;
-            bitmap = new WriteableBitmap(600, 600, 96, 96, PixelFormats.Bgr32, null);
-            image.Source = bitmap;
-            width = (int)(image.Source.Width);
-            height = (int)image.Source.Height;
-            bitmap.FillRectangle(0, 0, (int)width, (int)height, Colors.Blue);
+                FillFace(f, new Vertex(1,1,50));
         }
 
         public void draw(Vertex LightSource, ObjShape objShape)

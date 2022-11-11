@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
+using System.Windows.Media;
 
 namespace _3Dsimulator.Classes
 {
@@ -16,6 +18,12 @@ namespace _3Dsimulator.Classes
 
         private List<Face> faces = new List<Face>();
         public List<Face> Faces { get { return faces; } set { faces = value; } }
+
+        public double kd = 0.7;
+        public double ks = 0.5;
+        public System.Windows.Media.Color Il = Colors.White;
+        public System.Windows.Media.Color Io = Colors.Red;
+        public double m = 10;
 
         
 

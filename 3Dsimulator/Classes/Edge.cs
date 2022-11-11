@@ -15,6 +15,7 @@ namespace _3Dsimulator.Classes
         public double ymin { get { return Math.Min(V1.Y, V2.Y); } }
         public double xmin { get { return Math.Min(V1.X, V2.X); } }
         public double xmax { get { return Math.Max(V1.X, V2.X); } }
+        
         public double xminAlgorithm
         {
             get
@@ -23,14 +24,6 @@ namespace _3Dsimulator.Classes
                 return V1.X;
             }
         }
-
-                //public double ymax2screen { get { return Geo.y2h(Math.Max(V1.Y, V2.Y)); } }
-                //public double ymin2screen { get { return Geo.y2h(Math.Min(V1.Y, V2.Y)); } }
-                //public double xmin2screen { get { 
-                //        if(V2.Y < V1.Y) return Geo.x2w(V2.X);
-                //        return Geo.x2w(V1.X);
-                //   } }
-                //public double xmax2screen { get { return Geo.x2w(Math.Max(V1.X, V2.X)); } }
 
         public double dx_dy
         { 

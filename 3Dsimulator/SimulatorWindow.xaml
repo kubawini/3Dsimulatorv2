@@ -13,7 +13,44 @@
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Column="0" Background="Gray">
-            
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Slider Name="kdSlider" Minimum="0" Maximum="1" ValueChanged="kdSlider_ValueChanged"/>
+                <TextBlock Text="kd" Grid.Column="1" TextAlignment="Center"/>
+
+                <Slider Name="ksSlider" Grid.Row="1" Minimum="0" Maximum="1" ValueChanged="ksSlider_ValueChanged"/>
+                <TextBlock Text="ks" Grid.Column="1" Grid.Row="1" TextAlignment="Center"/>
+
+                <Slider Name="mSlider" Grid.Row="2" Minimum="0" Maximum="100" ValueChanged="mSlider_ValueChanged"/>
+                <TextBlock Text="m" Grid.Column="1" Grid.Row="2" TextAlignment="Center"/>
+
+                <Slider Name="zSlider" Grid.Row="3" Minimum="300" Maximum="15000" ValueChanged="zSlider_ValueChanged"/>
+                <TextBlock Text="z" Grid.Column="1" Grid.Row="3" TextAlignment="Center"/>
+
+                <Button Name="startTimerButton" Grid.Row="4" Content="Startuj spiralę" Click="startTimerButton_Click"/>
+
+                <ComboBox Name="objectColor" Grid.Row="5" SelectionChanged="objectColor_SelectionChanged"/>
+                <TextBlock Text="Kolor Obiektu" Grid.Row="5" Grid.Column="1" TextWrapping="Wrap"/>
+
+                <ComboBox Name="lightColor" Grid.Row="6" SelectionChanged="objectColor_SelectionChanged"/>
+                <TextBlock Text="Kolor Światła" Grid.Row="6" Grid.Column="1" TextWrapping="Wrap"/>
+
+                <CheckBox Name="gridCheckBox" Grid.Row="7" Content="Włącz siatkę" Checked="gridCheckBox_Checked" Unchecked="gridCheckBox_Unchecked"/>
+            </Grid>
         </Grid>
 
         <Image Name="shapeDisplay" Grid.Column="1"/> 

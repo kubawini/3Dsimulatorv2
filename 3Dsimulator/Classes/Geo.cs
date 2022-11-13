@@ -22,9 +22,14 @@ namespace _3Dsimulator.Classes
             return (int)(height/2 * (y + 1));
         }
 
-        public static int z2p(double y)
+        public static int z2p(double z)
         {
-            return (int)(height / 2 * y);
+            return (int)(height / 2 * z);
+        }
+
+        public static int p2z(double p)
+        {
+            return (int)(p / height * 2);
         }
 
         public static Color getVertexColor(Vertex v, Vertex LightSource, ObjShape os)

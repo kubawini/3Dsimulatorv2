@@ -15,14 +15,17 @@ namespace _3Dsimulator.Classes
         private ObjShape loadedShape;
         public ObjShape LoadedShape { get { return loadedShape; } }
 
+        private AppState appState;
+
         public WriteableBitmap bitmap;
         private Image image;
 
         private int width;
         private int height;
 
-        public BitmapDrawer(ObjShape ls, Image im)
+        public BitmapDrawer(ObjShape ls, Image im, AppState aS)
         {
+            appState = aS;
             loadedShape = ls;
             image = im;
             bitmap = new WriteableBitmap(600, 600, 96, 96, PixelFormats.Bgr32, null);
@@ -118,19 +121,23 @@ namespace _3Dsimulator.Classes
         public void FillObject()
         {
             foreach (var f in loadedShape.Faces)
-                FillFace(f, new Vertex(1,1,50));
+                FillFace(f, loadedShape.lightSource);
         }
 
-        public void draw(Vertex LightSource, ObjShape objShape)
+        public void draw()
         {
             bitmap.Lock();
-            foreach(var f in objShape.Faces)
+            FillObject();
+            if (appState.GridEnabled)
             {
-                var vc = f.Vertices.Count;
-                for(int i = 0; i < vc; i++)
+                foreach (var f in loadedShape.Faces)
                 {
-                    bitmap.DrawLine((int)f.Edges[i].V1.X, (int)(f.Edges[i].V1.Y),
-                        (int)(f.Edges[i].V2.X), (int)(f.Edges[i].V2.Y), Colors.Black);
+                    var vc = f.Vertices.Count;
+                    for (int i = 0; i < vc; i++)
+                    {
+                        bitmap.DrawLine((int)f.Edges[i].V1.X, (int)(f.Edges[i].V1.Y),
+                            (int)(f.Edges[i].V2.X), (int)(f.Edges[i].V2.Y), Colors.Black);
+                    }
                 }
             }
             bitmap.Unlock();

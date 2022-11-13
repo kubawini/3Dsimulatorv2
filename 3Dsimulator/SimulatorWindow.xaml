@@ -23,6 +23,9 @@
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*"/>
@@ -50,6 +53,20 @@
                 <TextBlock Text="Kolor Światła" Grid.Row="6" Grid.Column="1" TextWrapping="Wrap"/>
 
                 <CheckBox Name="gridCheckBox" Grid.Row="7" Content="Włącz siatkę" Checked="gridCheckBox_Checked" Unchecked="gridCheckBox_Unchecked"/>
+
+                <RadioButton Name="colorInterpolation" Grid.Row="8" Content="Interpolacja kolorów" Checked="colorInterpolation_Checked"/>
+                <RadioButton Name="vectorInterpolation" Grid.Row="9" Content="Interpolacja wektorów" Checked="vectorInterpolation_Checked"/>
+
+                <Grid Grid.Row="10" Grid.ColumnSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Name="loadTextureButton" Content="Załaduj teksturę" Click="loadTextureButton_Click"/>
+                    <CheckBox Name="useTextureCheckbox" Content="Użyj tekstury" Grid.Column="1" Click="useTextureCheckbox_Click"/>
+
+                </Grid>
             </Grid>
         </Grid>
 

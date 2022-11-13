@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Collections.ObjectModel;
+using Microsoft.Win32;
+
 
 using _3Dsimulator.Classes;
 
@@ -85,6 +87,11 @@ namespace _3Dsimulator
             gridBinding.Source = appState;
             gridBinding.Mode = BindingMode.TwoWay;
             gridCheckBox.SetBinding(CheckBox.IsCheckedProperty, gridBinding);
+
+            var interpolationBinding = new Binding("ColorInterpolation");
+            interpolationBinding.Source = appState;
+            interpolationBinding.Mode = BindingMode.TwoWay;
+            colorInterpolation.SetBinding(RadioButton.IsCheckedProperty, interpolationBinding);
         }
 
         private void kdSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => drawer.draw();
@@ -92,6 +99,11 @@ namespace _3Dsimulator
         private void mSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => drawer.draw();
         private void zSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {if(drawer != null) drawer.draw();}
         private void objectColor_SelectionChanged(object sender, SelectionChangedEventArgs e) => drawer.draw();
+        private void colorInterpolation_Checked(object sender, RoutedEventArgs e) => drawer.draw();
+        private void vectorInterpolation_Checked(object sender, RoutedEventArgs e) => drawer?.draw();
+        private void gridCheckBox_Checked(object sender, RoutedEventArgs e) => drawer.draw();
+        private void gridCheckBox_Unchecked(object sender, RoutedEventArgs e) => drawer.draw();
+
 
         private void startTimerButton_Click(object sender, RoutedEventArgs e)
         {
@@ -117,14 +129,27 @@ namespace _3Dsimulator
             drawer.draw();
         }
 
-
-        private void gridCheckBox_Checked(object sender, RoutedEventArgs e)
+        private void loadTextureButton_Click(object sender, RoutedEventArgs e)
         {
-            drawer.draw();
+            var ofd = new OpenFileDialog();
+            ofd.Filter = "Png files (*.png)|*.png|Jpg files (*.jpg)|*.jpg";
+            ofd.Title = "Wybieranie pliku *.png lub *.jpg";
+            ofd.ShowDialog();
+            appState.TexturePath = ofd.FileName;
         }
 
-        private void gridCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        private void useTextureCheckbox_Click(object sender, RoutedEventArgs e)
         {
+            if (useTextureCheckbox.IsChecked == true)
+            {
+                appState.openImage();
+                appState.TextureEnabled = true;
+                vectorInterpolation.IsChecked = true;
+            }
+            else 
+            {
+                appState.TextureEnabled = false;
+            }
             drawer.draw();
         }
     }

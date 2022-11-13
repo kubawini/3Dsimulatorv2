@@ -24,7 +24,7 @@ namespace _3Dsimulator.Classes
         private int height;
 
         public BitmapDrawer(ObjShape ls, Image im, AppState aS)
-        {
+        { 
             appState = aS;
             loadedShape = ls;
             image = im;
@@ -55,7 +55,7 @@ namespace _3Dsimulator.Classes
             var colors = new Color[f.Vertices.Count];
             for(int i = 0; i < f.Vertices.Count; i++)
             {
-                colors[i] = Geo.getVertexColor(f.Vertices[i], LightSource, LoadedShape);
+                colors[i] = Geo.getVertexColor(f.Vertices[i], LoadedShape);
             }
 
             int y = (int)f.ymin;
@@ -83,20 +83,42 @@ namespace _3Dsimulator.Classes
                         //bitmap.DrawLine((int)prev.xmin, y, (int)el.xmin, y, Colors.Red);
                         for(int x = (int)prev.xmin; x <= (int)el.xmin; x++)
                         {
-                            // Interpolation for triangle right now
+                            
                             double mian = (f.Vertices[1].Y - f.Vertices[2].Y) * (f.Vertices[0].X - f.Vertices[2].X) +
                                 (f.Vertices[2].X - f.Vertices[1].X) * (f.Vertices[0].Y - f.Vertices[2].Y);
-                            double wv1 = ((f.Vertices[1].Y - f.Vertices[2].Y) * (x-f.Vertices[2].X) +
+                            double wv1 = ((f.Vertices[1].Y - f.Vertices[2].Y) * (x - f.Vertices[2].X) +
                                 (f.Vertices[2].X - f.Vertices[1].X) * (y - f.Vertices[2].Y)) / mian;
                             double wv2 = ((f.Vertices[2].Y - f.Vertices[0].Y) * (x - f.Vertices[2].X) +
                                 (f.Vertices[0].X - f.Vertices[2].X) * (y - f.Vertices[2].Y)) / mian;
                             double wv3 = 1 - wv1 - wv2;
+                            byte R, G, B;
+                            NormalVector nv;
+                            Color c;
+                            // Interpolation for triangle right now (colors interpolation)
+                            if (appState.ColorInterpolation)
+                            {
+                                R = (byte)(wv1 * colors[0].R + wv2 * colors[1].R + wv3 * colors[2].R);
+                                G = (byte)(wv1 * colors[0].G + wv2 * colors[1].G + wv3 * colors[2].G);
+                                B = (byte)(wv1 * colors[0].B + wv2 * colors[1].B + wv3 * colors[2].B);
+                                c = Color.FromRgb(R, G, B);
+                            }
+                            else // Vectors interpolation
+                            {
+                                nv = new NormalVector(wv1 * f.Vertices[0].normalVector.X + wv2 * f.Vertices[1].normalVector.X + wv3 * f.Vertices[2].normalVector.X,
+                                    wv1 * f.Vertices[0].normalVector.Y + wv2 * f.Vertices[1].normalVector.Y + wv3 * f.Vertices[2].normalVector.Y,
+                                    wv1 * f.Vertices[0].normalVector.Z + wv2 * f.Vertices[1].normalVector.Z + wv3 * f.Vertices[2].normalVector.Z);
 
-                            byte R = (byte)(wv1 * colors[0].R + wv2 * colors[1].R + wv3 * colors[2].R);
-                            byte G = (byte)(wv1 * colors[0].G + wv2 * colors[1].G + wv3 * colors[2].G);
-                            byte B = (byte)(wv1 * colors[0].B + wv2 * colors[1].B + wv3 * colors[2].B);
-
-                            bitmap.SetPixel(x, y, Color.FromRgb(R, G, B));
+                                Vertex v = new Vertex(Geo.w2x(x), Geo.h2y(y), wv1 * Geo.p2z(f.Vertices[0].Z) + wv2 * Geo.p2z(f.Vertices[1].Z) + wv3 * Geo.p2z(f.Vertices[2].Z)); // To change z
+                                v.AddNormalVector(nv);
+                                if (appState.TextureEnabled)
+                                {
+                                    c = Geo.getVertexColor(v,LoadedShape, appState.Texture.GetPixel(x, y));
+                                }
+                                else
+                                    c = Geo.getVertexColor(v, LoadedShape);
+                            }
+                            
+                            bitmap.SetPixel(x, y, c);
                         }
                     }
                     prev = el;

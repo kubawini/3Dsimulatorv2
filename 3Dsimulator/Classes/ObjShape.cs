@@ -26,7 +26,7 @@ namespace _3Dsimulator.Classes
         private System.Windows.Media.Color _Il = Colors.White;
         private System.Windows.Media.Color _Io = Colors.Red;
         private double _m = 10;
-        private Vertex _lightSource = new Vertex(1, 1, 4);
+        private Vertex _lightSource = new Vertex(1, 0, 4);
         private double _r = 1;
 
 
@@ -38,6 +38,8 @@ namespace _3Dsimulator.Classes
         public Vertex lightSource { get { return _lightSource; } set { _lightSource = value; } }
         public double z { get { return _lightSource.Z; } set {  _lightSource.Z = value; } }
         public double r { get { return _r; } set { _r = value; } }
+
+
 
         public void AddVertex(Vertex v)
         {

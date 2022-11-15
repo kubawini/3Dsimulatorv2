@@ -35,6 +35,7 @@ namespace _3Dsimulator.Classes
                             // To add 3rd field
                         }
                         f!.CreateEdges();
+                        f.setAET();
                         result.AddFace(f);
                         break;
                     default:

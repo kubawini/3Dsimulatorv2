@@ -92,6 +92,16 @@ namespace _3Dsimulator
             interpolationBinding.Source = appState;
             interpolationBinding.Mode = BindingMode.TwoWay;
             colorInterpolation.SetBinding(RadioButton.IsCheckedProperty, interpolationBinding);
+
+            var textureBinding = new Binding("TextureEnabled");
+            textureBinding.Source = appState;
+            textureBinding.Mode = BindingMode.TwoWay;
+            useTextureCheckbox.SetBinding(CheckBox.IsCheckedProperty, textureBinding);
+
+            var normalMapBinding = new Binding("NormalMapEnabled");
+            normalMapBinding.Source = appState;
+            normalMapBinding.Mode = BindingMode.TwoWay;
+            useNormalMapCheckbox.SetBinding(CheckBox.IsCheckedProperty, normalMapBinding);
         }
 
         private void kdSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => drawer.draw();
@@ -99,10 +109,15 @@ namespace _3Dsimulator
         private void mSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => drawer.draw();
         private void zSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {if(drawer != null) drawer.draw();}
         private void objectColor_SelectionChanged(object sender, SelectionChangedEventArgs e) => drawer.draw();
-        private void colorInterpolation_Checked(object sender, RoutedEventArgs e) => drawer.draw();
         private void vectorInterpolation_Checked(object sender, RoutedEventArgs e) => drawer?.draw();
         private void gridCheckBox_Checked(object sender, RoutedEventArgs e) => drawer.draw();
         private void gridCheckBox_Unchecked(object sender, RoutedEventArgs e) => drawer.draw();
+        private void colorInterpolation_Checked(object sender, RoutedEventArgs e)
+        {
+            useTextureCheckbox.IsChecked = false;
+            useNormalMapCheckbox.IsChecked = false;
+            drawer.draw();
+        }
 
 
         private void startTimerButton_Click(object sender, RoutedEventArgs e)
@@ -135,7 +150,8 @@ namespace _3Dsimulator
             ofd.Filter = "Png files (*.png)|*.png|Jpg files (*.jpg)|*.jpg";
             ofd.Title = "Wybieranie pliku *.png lub *.jpg";
             ofd.ShowDialog();
-            appState.TexturePath = ofd.FileName;
+            if(ofd.FileName!="")
+                appState.TexturePath = ofd.FileName;
         }
 
         private void useTextureCheckbox_Click(object sender, RoutedEventArgs e)
@@ -149,6 +165,31 @@ namespace _3Dsimulator
             else 
             {
                 appState.TextureEnabled = false;
+            }
+            drawer.draw();
+        }
+
+        private void loadNormalMapButton_Click(object sender, RoutedEventArgs e)
+        {
+            var ofd = new OpenFileDialog();
+            ofd.Filter = "Png files (*.png)|*.png|Jpg files (*.jpg)|*.jpg";
+            ofd.Title = "Wybieranie pliku *.png lub *.jpg";
+            ofd.ShowDialog();
+            if (ofd.FileName != "")
+                appState.NormalMapPath = ofd.FileName;
+        }
+
+        private void useNormalMapCheckbox_Click(object sender, RoutedEventArgs e)
+        {
+            if (useNormalMapCheckbox.IsChecked == true)
+            {
+                appState.openNormalMap();
+                appState.NormalMapEnabled = true;
+                vectorInterpolation.IsChecked = true;
+            }
+            else
+            {
+                appState.NormalMapEnabled = false;
             }
             drawer.draw();
         }

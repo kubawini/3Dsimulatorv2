@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Drawing;
 using System.Windows.Media;
+using System.IO;
 
 
 namespace _3Dsimulator.Classes
@@ -30,13 +31,21 @@ namespace _3Dsimulator.Classes
         private bool colorInterpolation = true;
         public bool ColorInterpolation { get { return colorInterpolation; } set { colorInterpolation = value; OnPropertyChanged(); } }
 
-        private string texturePath = ""; // To add default
+        private string texturePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\Resources\texture.png")); // To add default
         public string TexturePath { get { return texturePath; } set { texturePath = value; OnPropertyChanged();} }
 
         private bool textureEnabled = false;
         public bool TextureEnabled { get { return textureEnabled; } set { textureEnabled = value; OnPropertyChanged(); } }
 
+        private string normalMapPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\Resources\MapaNormalna.png")); // To add default
+        public string NormalMapPath { get { return texturePath; } set { texturePath = value; OnPropertyChanged(); } }
+
+        private bool normalMapEnabled = false;
+        public bool NormalMapEnabled { get { return normalMapEnabled; } set { normalMapEnabled = value; OnPropertyChanged(); } }
+
         public WriteableBitmap Texture = null; // To add default
+        public WriteableBitmap NormalMap = null; // To add default
+
 
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -48,6 +57,11 @@ namespace _3Dsimulator.Classes
         public void openImage()
         {
             Texture = new WriteableBitmap(new BitmapImage(new Uri(texturePath)));
+        }
+
+        public void openNormalMap()
+        {
+            NormalMap = new WriteableBitmap(new BitmapImage(new Uri(normalMapPath)));
         }
     }
 }

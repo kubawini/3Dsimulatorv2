@@ -25,7 +25,8 @@
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*"/>
@@ -62,10 +63,21 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-
                     <Button Name="loadTextureButton" Content="Załaduj teksturę" Click="loadTextureButton_Click"/>
                     <CheckBox Name="useTextureCheckbox" Content="Użyj tekstury" Grid.Column="1" Click="useTextureCheckbox_Click"/>
+                </Grid>
 
+                <Grid Grid.Row="11" Grid.ColumnSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Name="loadNormalMapButton" Click="loadNormalMapButton_Click">
+                        <TextBlock TextWrapping="wrap"> Załaduj mapę wektorów</TextBlock>
+                    </Button>
+                    <CheckBox Name="useNormalMapCheckbox" Grid.Column="1" Click="useNormalMapCheckbox_Click">
+                        <TextBlock TextWrapping="Wrap"> Użyj mapy wektorów</TextBlock>
+                    </CheckBox>
                 </Grid>
             </Grid>
         </Grid>

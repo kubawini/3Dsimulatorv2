@@ -12,6 +12,8 @@ namespace _3Dsimulator.Classes
 {
     public class BitmapDrawer
     {
+        private int size = 600;
+
         private ObjShape loadedShape;
         public ObjShape LoadedShape { get { return loadedShape; } }
 
@@ -28,17 +30,18 @@ namespace _3Dsimulator.Classes
             appState = aS;
             loadedShape = ls;
             image = im;
-            bitmap = new WriteableBitmap(600, 600, 96, 96, PixelFormats.Bgr32, null);
+            bitmap = new WriteableBitmap(size, size, 96, 96, PixelFormats.Bgr32, null);
             image.Source = bitmap;
             width = (int)(image.Source.Width);
             height = (int)image.Source.Height;
-            bitmap.FillRectangle(0, 0, (int)width, (int)height, Colors.Blue);
+            bitmap.FillRectangle(0, 0, (int)width, (int)height, Colors.White);
         }
 
-        public List<ETitem>[] CreateET(Face f)
+        public static List<ETitem>[] CreateET(Face f, int h)
         {
-            var ET = new List<ETitem>[height];
+            var ET = new List<ETitem>[h];
             
+
             foreach(var e in f.Edges)
             {
                 if (e.ymin != e.ymax)
@@ -50,6 +53,11 @@ namespace _3Dsimulator.Classes
             return ET;
         }
 
+        public List<ETitem>[] CreateET(Face f)
+        {
+            return CreateET(f, height);
+        }
+
         public void FillFace(Face f, Vertex LightSource)
         {
             var colors = new Color[f.Vertices.Count];
@@ -59,31 +67,21 @@ namespace _3Dsimulator.Classes
             }
 
             int y = (int)f.ymin;
-            var ET = CreateET(f);
-            List<ETitem> AET = new List<ETitem>();
-            while (y <= (int)f.ymax)
+            int yBase = y;
+
+            while (y <= (int)Math.Round(f.ymax))
             {
-                if(ET[y]!=null)
-                    AET = new List<ETitem>(AET.Concat(ET[y]));
-
-                AET.Sort((a,b)=> {
-                    if (a.xmin < b.xmin) return -1;
-                    else if(a.xmin > b.xmin) return 1;
-                    return 0;});
-
                 // Drawing
-                bitmap.Lock();
                 int i = 0;
                 ETitem prev = null;
-                foreach (var el in AET)
+                foreach (var el in f.AET[y-yBase])
                 {
                     if (i % 2 == 1)
                     {
                         var a = 0;
                         //bitmap.DrawLine((int)prev.xmin, y, (int)el.xmin, y, Colors.Red);
-                        for(int x = (int)prev.xmin; x <= (int)el.xmin; x++)
-                        {
-                            
+                        for(int x = (int)prev.xmin; x <= Math.Round(el.xmin); x++)
+                        {                       
                             double mian = (f.Vertices[1].Y - f.Vertices[2].Y) * (f.Vertices[0].X - f.Vertices[2].X) +
                                 (f.Vertices[2].X - f.Vertices[1].X) * (f.Vertices[0].Y - f.Vertices[2].Y);
                             double wv1 = ((f.Vertices[1].Y - f.Vertices[2].Y) * (x - f.Vertices[2].X) +
@@ -114,8 +112,33 @@ namespace _3Dsimulator.Classes
                                 {
                                     c = Geo.getVertexColor(v,LoadedShape, appState.Texture.GetPixel(x, y));
                                 }
-                                else
+                                else if(!appState.NormalMapEnabled)
                                     c = Geo.getVertexColor(v, LoadedShape);
+                                else
+                                {
+                                    var normalMapSizeX = appState.NormalMap.PixelWidth;
+                                    var normalMapSizeY = appState.NormalMap.PixelHeight;
+                                    var xM = ((double)x) / ((double)size) * normalMapSizeX;
+                                    if (xM > normalMapSizeX) xM = normalMapSizeX;
+                                    var yM = ((double)y) / ((double)size) * normalMapSizeY;
+                                    if (yM > normalMapSizeX) yM = normalMapSizeY;
+
+                                    var colorNormalMap = appState.NormalMap.GetPixel((int)xM,(int)yM);
+
+                                    var Bv = new NormalVector(0, 0, 1); //nv.Z?
+                                    if (nv.Z == 1 && nv.X == 0 && nv.Y == 0) Bv = new NormalVector(0, 1, 0);
+                                    var Tv = new NormalVector(Bv.X*nv.X, Bv.Y*nv.Y, Bv.Z*nv.Z);
+                                    var Ntv = new NormalVector(((double)colorNormalMap.R) / 128 - 1, ((double)colorNormalMap.G) / 128 - 1, ((double)colorNormalMap.B) / 255);
+                                    nv = new NormalVector(Tv.X * Ntv.X + Bv.X * Ntv.Y + nv.X * Ntv.Z,
+                                        Tv.Y * Ntv.X + Bv.Y * Ntv.Y + nv.Y * Ntv.Z,
+                                        Tv.Z * Ntv.X + Bv.Z * Ntv.Y + nv.Z * Ntv.Z);
+                                    var length = Math.Sqrt(nv.X * nv.X + nv.Y * nv.Y + nv.Z * nv.Z);
+                                    nv.X /= length;
+                                    nv.Y /= length;
+                                    nv.Z /= length;
+                                    v.AddNormalVector(nv);
+                                    c = Geo.getVertexColor(v, LoadedShape);
+                                }
                             }
                             
                             bitmap.SetPixel(x, y, c);
@@ -124,19 +147,7 @@ namespace _3Dsimulator.Classes
                     prev = el;
                     i++;
                 }
-                bitmap.Unlock();
-
-                y++;
-                for (int x = 0; x < AET.Count; x++)
-                {
-                    ETitem item = AET[x];
-                    item.xmin += item.dx_dy;
-                    if(item.ymax <= y)
-                    {
-                        AET.RemoveAt(x);
-                    }
-                }
-                
+                y++;   
             }
         }
 

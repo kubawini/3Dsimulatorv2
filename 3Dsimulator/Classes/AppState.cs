@@ -38,7 +38,7 @@ namespace _3Dsimulator.Classes
         public bool TextureEnabled { get { return textureEnabled; } set { textureEnabled = value; OnPropertyChanged(); } }
 
         private string normalMapPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\Resources\MapaNormalna.png")); // To add default
-        public string NormalMapPath { get { return texturePath; } set { texturePath = value; OnPropertyChanged(); } }
+        public string NormalMapPath { get { return normalMapPath; } set { normalMapPath = value; OnPropertyChanged(); } }
 
         private bool normalMapEnabled = false;
         public bool NormalMapEnabled { get { return normalMapEnabled; } set { normalMapEnabled = value; OnPropertyChanged(); } }

@@ -11,13 +11,24 @@ namespace _3Dsimulator.Classes
         public static ObjShape read(string filePath)
         {
             var result = new ObjShape();
+            double maxLen = 0;
+            foreach (string line in System.IO.File.ReadLines(filePath))
+            {
+                var scheme = line.Split(' ');
+                if (scheme[0] == "v")
+                {
+                    if (s2dConv(scheme[1]) > maxLen) maxLen = s2dConv(scheme[1]);
+                    if (s2dConv(scheme[2]) > maxLen) maxLen = s2dConv(scheme[2]);
+                    if (s2dConv(scheme[3]) > maxLen) maxLen = s2dConv(scheme[3]);
+                }
+            }
             foreach (string line in System.IO.File.ReadLines(filePath))
             {
                 var scheme = line.Split(' ');
                 switch (scheme[0])
                 {
                     case "v":
-                        result.AddVertex(new Vertex(s2dConv(scheme[1]), s2dConv(scheme[2]), s2dConv(scheme[3])));
+                        result.AddVertex(new Vertex(s2dConv(scheme[1])/maxLen, s2dConv(scheme[2])/maxLen, s2dConv(scheme[3])/maxLen));
                         break;
                     case "vn":
                         result.AddNormalVector(new NormalVector(s2dConv(scheme[1]), s2dConv(scheme[2]), s2dConv(scheme[3])));

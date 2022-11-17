@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "pqkq4VBlMEwoRFbunT49U7oApbvljfOxgkho8ZSUOa+9Z4kHUmuAMCxfXa32+gEhKWC64+XnhOPktNSEoYYVDQ==",
+  "dgSpecHash": "T7l5OEjfrWqsTwQb7XnIosfRGH3UGSPdukHzORco3YywFtUhBSLpU89LeXSzfpwJsRKDjNq2llH3vXz8L0VWTA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\kubaw\\Desktop\\AntyAvastVS\\3Dsimulator\\3Dsimulator\\3Dsimulator.csproj",
+  "projectFilePath": "C:\\Users\\kubaw\\Desktop\\AntyAvastVS\\3Dsimulatorv2\\3Dsimulator\\3Dsimulator\\3Dsimulator.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\kubaw\\.nuget\\packages\\writeablebitmapex\\1.6.8\\writeablebitmapex.1.6.8.nupkg.sha512"
   ],

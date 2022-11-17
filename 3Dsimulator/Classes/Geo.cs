@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace _3Dsimulator.Classes
 {
@@ -42,7 +39,33 @@ namespace _3Dsimulator.Classes
             return (p / height * 2);
         }
 
-        public static Color getVertexColor(Vertex v, ObjShape os, Color c)
+        public static NormalVector modifyNormalVector(NormalVector nv, AppState appState, int x, int y, BitmapDrawer bm)
+        {
+            var normalMapSizeX = appState.NormalMap.PixelWidth;
+            var normalMapSizeY = appState.NormalMap.PixelHeight;
+            var xM = ((double)x) / ((double)bm.size) * normalMapSizeX;
+            if (xM > normalMapSizeX) xM = normalMapSizeX;
+            var yM = ((double)y) / ((double)bm.size) * normalMapSizeY;
+            if (yM > normalMapSizeX) yM = normalMapSizeY;
+
+            var colorNormalMap = appState.NormalMap.GetPixel((int)xM, (int)yM);
+
+            var Bv = new NormalVector(0, 0, 1); //nv.Z?
+            if (nv.Z == 1 && nv.X == 0 && nv.Y == 0) Bv = new NormalVector(0, 1, 0);
+            var Tv = new NormalVector(Bv.X * nv.X, Bv.Y * nv.Y, Bv.Z * nv.Z);
+            var Ntv = new NormalVector(((double)colorNormalMap.R) / 128 - 1, ((double)colorNormalMap.G) / 128 - 1, ((double)colorNormalMap.B) / 255);
+            nv = new NormalVector(Tv.X * Ntv.X + Bv.X * Ntv.Y + nv.X * Ntv.Z,
+                Tv.Y * Ntv.X + Bv.Y * Ntv.Y + nv.Y * Ntv.Z,
+                Tv.Z * Ntv.X + Bv.Z * Ntv.Y + nv.Z * Ntv.Z);
+            var length = Math.Sqrt(nv.X * nv.X + nv.Y * nv.Y + nv.Z * nv.Z);
+            nv.X /= length;
+            nv.Y /= length;
+            nv.Z /= length;
+
+            return nv;
+        }
+
+        public static Color getVertexColor(Vertex v, ObjShape os, Color c, NormalVector nv)
         {
             var xL = os.lightSource.X - v.X;
             var yL = os.lightSource.Y - v.Y;
@@ -50,13 +73,15 @@ namespace _3Dsimulator.Classes
             var len = Math.Sqrt(xL*xL + yL*yL + zL*zL);
 
             NormalVector L = new NormalVector(xL / len, yL / len, zL / len);
-            var cosNL = v.normalVector.X * L.X + v.normalVector.Y * L.Y + v.normalVector.Z * L.Z;
-            
+            var cosNL = nv.X * L.X + nv.Y * L.Y + nv.Z * L.Z;
+
+            if (cosNL < 0) cosNL = 0;
+
             var V = new NormalVector(0, 0, 1);
-            var R = new NormalVector(-L.X, -L.Y, 2 * cosNL - L.Z);
+            var R = new NormalVector(2 * cosNL * nv.X -L.X,2 * cosNL * nv.Y -L.Y, 2 * cosNL * nv.Z - L.Z); // I change
             var lenR = Math.Sqrt(R.X*R.X + R.Y * R.Y + R.Z*R.Z);
             var cosVR = R.Z / lenR;
-            if (cosNL < 0) cosNL = 0;
+            
             if (cosVR < 0) cosVR = 0;
             var Red = ((os.Il.R * c.R/ 255) * (os.kd * cosNL + os.ks * Math.Pow(cosVR, os.m)));
             var bRed = (byte)Red;
@@ -70,9 +95,19 @@ namespace _3Dsimulator.Classes
             return Color.FromRgb(bRed, bGreen, bBlue);
         }
 
+        public static Color getVertexColor(Vertex v, ObjShape os, NormalVector nv)
+        {
+            return getVertexColor(v, os, os.Io, nv);
+        }
+
+        public static Color getVertexColor(Vertex v, ObjShape os, Color c)
+        {
+            return getVertexColor(v, os, c, v.normalVector);
+        }
+
         public static Color getVertexColor(Vertex v, ObjShape os)
         {
-            return getVertexColor(v, os, os.Io);
+            return getVertexColor(v, os, os.Io, v.normalVector);
         }
     }
 }

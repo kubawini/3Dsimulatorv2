@@ -44,6 +44,8 @@ namespace _3Dsimulator.Classes
         public bool NormalMapEnabled { get { return normalMapEnabled; } set { normalMapEnabled = value; OnPropertyChanged(); } }
 
         public WriteableBitmap Texture = null; // To add default
+        public System.Windows.Media.Color[,] TextureColors;
+
         public WriteableBitmap NormalMap = null; // To add default
 
 
@@ -57,6 +59,14 @@ namespace _3Dsimulator.Classes
         public void openImage()
         {
             Texture = new WriteableBitmap(new BitmapImage(new Uri(texturePath)));
+            TextureColors = new System.Windows.Media.Color[Texture.PixelWidth + 1, Texture.PixelHeight + 1];
+            for (int x = 0; x <= Texture.PixelWidth; x++)
+            {
+                for (int y = 0; y <= Texture.PixelHeight; y++)
+                {
+                    TextureColors[x, y] = Texture.GetPixel(x, y);
+                }
+            }  
         }
 
         public void openNormalMap()

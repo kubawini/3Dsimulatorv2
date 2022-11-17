@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
+using System.IO;
 
 using _3Dsimulator.Classes;
 using _3Dsimulator.Converters;
@@ -44,6 +45,7 @@ namespace _3Dsimulator
         private void selectPathButton_Click(object sender, RoutedEventArgs e)
         {
             var ofd = new OpenFileDialog();
+            ofd.InitialDirectory = System.IO.Path.GetFullPath(System.IO.Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\Resources"));
             ofd.Filter = "Obj files (*.obj)|*.obj";
             ofd.Title = "Wybieranie pliku *.obj";
             ofd.ShowDialog();

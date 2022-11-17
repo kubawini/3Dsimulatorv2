@@ -17,7 +17,48 @@ namespace _3Dsimulator.Classes
         public double ymax = double.MinValue;
 
         public ETitem[][] AET;
+        public NormalVector[,] normalVectors;
+        public NormalVector[,] normalModifiedVectors;
 
+        // COME BACK THERE - currently useless
+        public void interpolateVectors()
+        {
+            int y = (int)ymin;
+            int yBase = y;
+            double mian, wv1, wv2, wv3;
+            normalVectors = new NormalVector[600, 600];
+
+            while (y <= (int)Math.Round(ymax))
+            {
+                int i = 0;
+                ETitem prev = null;
+                foreach (var el in AET[y - yBase])
+                {
+                    if (i % 2 == 1)
+                    {
+                        var a = 0;
+                        for (int x = (int)prev.xmin; x <= Math.Round(el.xmin); x++)
+                        {
+
+                            mian = (Vertices[1].Y - Vertices[2].Y) * (Vertices[0].X - Vertices[2].X) +
+                                            (Vertices[2].X - Vertices[1].X) * (Vertices[0].Y - Vertices[2].Y);
+                            wv1 = ((Vertices[1].Y - Vertices[2].Y) * (x - Vertices[2].X) +
+                                (Vertices[2].X - Vertices[1].X) * (y - Vertices[2].Y)) / mian;
+                            wv2 = ((Vertices[2].Y - Vertices[0].Y) * (x - Vertices[2].X) +
+                                (Vertices[0].X - Vertices[2].X) * (y - Vertices[2].Y)) / mian;
+                            wv3 = 1 - wv1 - wv2;
+                            normalVectors[x,y] = new NormalVector(wv1 * Vertices[0].normalVector.X + wv2 * Vertices[1].normalVector.X + wv3 * Vertices[2].normalVector.X,
+                                wv1 * Vertices[0].normalVector.Y + wv2 * Vertices[1].normalVector.Y + wv3 * Vertices[2].normalVector.Y,
+                                wv1 * Vertices[0].normalVector.Z + wv2 * Vertices[1].normalVector.Z + wv3 * Vertices[2].normalVector.Z);
+                        }
+                    }
+                    prev = el;
+                    i++;
+                }
+                y++;
+            }
+        }
+        
         public void setAET()
         {
             int AETsize = (int)Math.Round(ymax) - (int)ymin + 1;

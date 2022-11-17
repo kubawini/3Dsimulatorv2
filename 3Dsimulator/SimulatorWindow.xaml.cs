@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Collections.ObjectModel;
 using Microsoft.Win32;
+using System.IO;
 
 
 using _3Dsimulator.Classes;
@@ -28,6 +29,7 @@ namespace _3Dsimulator
         AppState appState;
         ObjShape objShape;
         BitmapDrawer drawer;
+        MainWindow mainWindow;
 
         int spiralClickCounter = 0;
         DispatcherTimer dispatcherTimer = new DispatcherTimer();
@@ -41,10 +43,7 @@ namespace _3Dsimulator
             shapeDisplay.BeginInit();
             drawer = new BitmapDrawer(objShape, shapeDisplay, appState);
             dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
-
-            //drawer.FillObject();
-            //drawer.draw(new Vertex(0, 0, 1), objShape);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 40);
 
             // Bindings
             var kdBinding = new Binding("kd");
@@ -112,12 +111,7 @@ namespace _3Dsimulator
         private void vectorInterpolation_Checked(object sender, RoutedEventArgs e) => drawer?.draw();
         private void gridCheckBox_Checked(object sender, RoutedEventArgs e) => drawer.draw();
         private void gridCheckBox_Unchecked(object sender, RoutedEventArgs e) => drawer.draw();
-        private void colorInterpolation_Checked(object sender, RoutedEventArgs e)
-        {
-            useTextureCheckbox.IsChecked = false;
-            useNormalMapCheckbox.IsChecked = false;
-            drawer.draw();
-        }
+        private void colorInterpolation_Checked(object sender, RoutedEventArgs e) => drawer.draw();
 
 
         private void startTimerButton_Click(object sender, RoutedEventArgs e)
@@ -137,8 +131,11 @@ namespace _3Dsimulator
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
+            drawer.bitmap.FillEllipse((int)objShape.lightSource.X - 5, (int)objShape.lightSource.Y - 5,
+                (int)objShape.lightSource.X + 5, (int)objShape.lightSource.Y + 5, Colors.White);
             appState.Time += 0.1;
-            objShape.r += 0.1;
+            objShape.r += 0.01;
+            if (objShape.r > 1.5) objShape.r = 0;
             objShape.lightSource.X = Geo.x2w(Math.Cos(appState.Time) * objShape.r);
             objShape.lightSource.Y = Geo.y2h(Math.Sin(appState.Time) * objShape.r);
             drawer.draw();
@@ -147,6 +144,7 @@ namespace _3Dsimulator
         private void loadTextureButton_Click(object sender, RoutedEventArgs e)
         {
             var ofd = new OpenFileDialog();
+            ofd.InitialDirectory = System.IO.Path.GetFullPath(System.IO.Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\Resources"));
             ofd.Filter = "Png files (*.png)|*.png|Jpg files (*.jpg)|*.jpg";
             ofd.Title = "Wybieranie pliku *.png lub *.jpg";
             ofd.ShowDialog();
@@ -160,7 +158,6 @@ namespace _3Dsimulator
             {
                 appState.openImage();
                 appState.TextureEnabled = true;
-                vectorInterpolation.IsChecked = true;
             }
             else 
             {
@@ -172,6 +169,7 @@ namespace _3Dsimulator
         private void loadNormalMapButton_Click(object sender, RoutedEventArgs e)
         {
             var ofd = new OpenFileDialog();
+            ofd.InitialDirectory = System.IO.Path.GetFullPath(System.IO.Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\Resources"));
             ofd.Filter = "Png files (*.png)|*.png|Jpg files (*.jpg)|*.jpg";
             ofd.Title = "Wybieranie pliku *.png lub *.jpg";
             ofd.ShowDialog();
@@ -185,13 +183,23 @@ namespace _3Dsimulator
             {
                 appState.openNormalMap();
                 appState.NormalMapEnabled = true;
-                vectorInterpolation.IsChecked = true;
             }
             else
             {
                 appState.NormalMapEnabled = false;
             }
             drawer.draw();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            mainWindow = new MainWindow();
+            Application.Current.MainWindow = mainWindow;
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            mainWindow.ShowDialog();
         }
     }
 }

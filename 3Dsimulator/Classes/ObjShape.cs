@@ -26,8 +26,8 @@ namespace _3Dsimulator.Classes
         private System.Windows.Media.Color _Il = Colors.White;
         private System.Windows.Media.Color _Io = Colors.Red;
         private double _m = 10;
-        private Vertex _lightSource = new Vertex(1, 0, 4);
-        private double _r = 1;
+        private Vertex _lightSource = new Vertex(0, 0, 2);
+        private double _r = 0;
 
 
         public double kd { get { return _kd; } set { _kd = value; /*OnPropertyChanged();*/ } }

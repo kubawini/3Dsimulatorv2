@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_3Dsimulator"
         mc:Ignorable="d"
-        Title="Symulator 3D" ResizeMode="NoResize" Height="450" Width="800">
+        Title="Symulator 3D" ResizeMode="NoResize" Height="450" Width="800" Closing="Window_Closing" Closed="Window_Closed">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
@@ -33,38 +33,38 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Slider Name="kdSlider" Minimum="0" Maximum="1" ValueChanged="kdSlider_ValueChanged"/>
-                <TextBlock Text="kd" Grid.Column="1" TextAlignment="Center"/>
+                <Slider Name="kdSlider" Minimum="0" Maximum="1" Margin="5" ValueChanged="kdSlider_ValueChanged"/>
+                <TextBlock Text="kd (0-1)" Grid.Column="1" TextAlignment="Center"/>
 
-                <Slider Name="ksSlider" Grid.Row="1" Minimum="0" Maximum="1" ValueChanged="ksSlider_ValueChanged"/>
-                <TextBlock Text="ks" Grid.Column="1" Grid.Row="1" TextAlignment="Center"/>
+                <Slider Name="ksSlider" Grid.Row="1" Minimum="0" Maximum="1" Margin="5" ValueChanged="ksSlider_ValueChanged"/>
+                <TextBlock Text="ks (0-1)" Grid.Column="1" Grid.Row="1" TextAlignment="Center"/>
 
-                <Slider Name="mSlider" Grid.Row="2" Minimum="0" Maximum="100" ValueChanged="mSlider_ValueChanged"/>
-                <TextBlock Text="m" Grid.Column="1" Grid.Row="2" TextAlignment="Center"/>
+                <Slider Name="mSlider" Grid.Row="2" Minimum="0" Maximum="100" Margin="5" ValueChanged="mSlider_ValueChanged"/>
+                <TextBlock Text="m (0-100)" Grid.Column="1" Grid.Row="2" TextAlignment="Center"/>
 
-                <Slider Name="zSlider" Grid.Row="3" Minimum="300" Maximum="15000" ValueChanged="zSlider_ValueChanged"/>
-                <TextBlock Text="z" Grid.Column="1" Grid.Row="3" TextAlignment="Center"/>
+                <Slider Name="zSlider" Grid.Row="3" Minimum="300" Maximum="1200" Margin="5" ValueChanged="zSlider_ValueChanged"/>
+                <TextBlock Text="z (1-4)" Grid.Column="1" Grid.Row="3" TextAlignment="Center"/>
 
-                <Button Name="startTimerButton" Grid.Row="4" Content="Startuj spiralę" Click="startTimerButton_Click"/>
+                <Button Name="startTimerButton" Grid.Row="4" Content="Startuj spiralę" Margin="2" Click="startTimerButton_Click"/>
 
-                <ComboBox Name="objectColor" Grid.Row="5" SelectionChanged="objectColor_SelectionChanged"/>
+                <ComboBox Name="objectColor" Grid.Row="5" Margin="5" SelectionChanged="objectColor_SelectionChanged"/>
                 <TextBlock Text="Kolor Obiektu" Grid.Row="5" Grid.Column="1" TextWrapping="Wrap"/>
 
-                <ComboBox Name="lightColor" Grid.Row="6" SelectionChanged="objectColor_SelectionChanged"/>
+                <ComboBox Name="lightColor" Grid.Row="6" Margin="5" SelectionChanged="objectColor_SelectionChanged"/>
                 <TextBlock Text="Kolor Światła" Grid.Row="6" Grid.Column="1" TextWrapping="Wrap"/>
 
-                <CheckBox Name="gridCheckBox" Grid.Row="7" Content="Włącz siatkę" Checked="gridCheckBox_Checked" Unchecked="gridCheckBox_Unchecked"/>
+                <CheckBox Name="gridCheckBox" Grid.Row="7" Margin="5" Content="Włącz siatkę" Checked="gridCheckBox_Checked" Unchecked="gridCheckBox_Unchecked"/>
 
-                <RadioButton Name="colorInterpolation" Grid.Row="8" Content="Interpolacja kolorów" Checked="colorInterpolation_Checked"/>
-                <RadioButton Name="vectorInterpolation" Grid.Row="9" Content="Interpolacja wektorów" Checked="vectorInterpolation_Checked"/>
+                <RadioButton Name="colorInterpolation" Grid.Row="8" Margin="5" Content="Interpolacja kolorów" Checked="colorInterpolation_Checked"/>
+                <RadioButton Name="vectorInterpolation" Grid.Row="9" Margin="5" Content="Interpolacja wektorów" Checked="vectorInterpolation_Checked"/>
 
                 <Grid Grid.Row="10" Grid.ColumnSpan="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Button Name="loadTextureButton" Content="Załaduj teksturę" Click="loadTextureButton_Click"/>
-                    <CheckBox Name="useTextureCheckbox" Content="Użyj tekstury" Grid.Column="1" Click="useTextureCheckbox_Click"/>
+                    <Button Name="loadTextureButton" Content="Załaduj teksturę" Margin="2" Click="loadTextureButton_Click"/>
+                    <CheckBox Name="useTextureCheckbox" Content="Użyj tekstury" Margin="5" Grid.Column="1" Click="useTextureCheckbox_Click"/>
                 </Grid>
 
                 <Grid Grid.Row="11" Grid.ColumnSpan="2">
@@ -72,10 +72,10 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Button Name="loadNormalMapButton" Click="loadNormalMapButton_Click">
+                    <Button Name="loadNormalMapButton" Margin="2" Click="loadNormalMapButton_Click">
                         <TextBlock TextWrapping="wrap"> Załaduj mapę wektorów</TextBlock>
                     </Button>
-                    <CheckBox Name="useNormalMapCheckbox" Grid.Column="1" Click="useNormalMapCheckbox_Click">
+                    <CheckBox Name="useNormalMapCheckbox" Grid.Column="1" Margin="5" Click="useNormalMapCheckbox_Click">
                         <TextBlock TextWrapping="Wrap"> Użyj mapy wektorów</TextBlock>
                     </CheckBox>
                 </Grid>

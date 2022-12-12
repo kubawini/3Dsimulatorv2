@@ -123,6 +123,11 @@ namespace _3Dsimulator
             cloudBinding.Source = appState;
             cloudBinding.Mode = BindingMode.TwoWay;
             allowCloud.SetBinding(CheckBox.IsCheckedProperty, cloudBinding);
+
+            var paintingBinding = new Binding("PaintingAllowed");
+            paintingBinding.Source = appState;
+            paintingBinding.Mode = BindingMode.TwoWay;
+            allowPaintingCheckbox.SetBinding(CheckBox.IsCheckedProperty, paintingBinding);
         }
 
         private void kdSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => drawer.draw();
@@ -135,6 +140,7 @@ namespace _3Dsimulator
         private void gridCheckBox_Unchecked(object sender, RoutedEventArgs e) => drawer.draw();
         private void colorInterpolation_Checked(object sender, RoutedEventArgs e) => drawer.draw();
         private void allowCloud_Click(object sender, RoutedEventArgs e) => drawer.draw();
+        private void allowPaintingCheckbox_Click(object sender, RoutedEventArgs e) => drawer.draw();
 
 
         private void startTimerButton_Click(object sender, RoutedEventArgs e)
@@ -240,6 +246,19 @@ namespace _3Dsimulator
             mainWindow.ShowDialog();
         }
 
-        
+        private void addNextObj_Click(object sender, RoutedEventArgs e)
+        {
+            var ofd = new OpenFileDialog();
+            ofd.InitialDirectory = System.IO.Path.GetFullPath(System.IO.Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\Resources"));
+            ofd.Filter = "Png files (*.obj)|*.obj";
+            ofd.Title = "Wybieranie pliku *.obj";
+            ofd.ShowDialog();
+            if (ofd.FileName != "")
+            {
+                appState.NormalMapPath = ofd.FileName;
+                drawer.addNewObj(ofd.FileName);
+                drawer.draw();
+            }
+        }
     }
 }

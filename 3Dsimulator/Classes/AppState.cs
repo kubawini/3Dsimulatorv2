@@ -43,8 +43,14 @@ namespace _3Dsimulator.Classes
         private bool normalMapEnabled = false;
         public bool NormalMapEnabled { get { return normalMapEnabled; } set { normalMapEnabled = value; OnPropertyChanged(); } }
 
-        private bool cloudAllowed = true;
+        private bool cloudAllowed = false;
         public bool CloudAllowed { get { return cloudAllowed; } set { cloudAllowed = value; OnPropertyChanged();} }
+
+        private bool paintingAllowed = false;
+        public bool PaintingAllowed { get { return paintingAllowed; } set { paintingAllowed = value; OnPropertyChanged(); } }
+
+        private string nextObjPath = "";
+        public string NextObjPath { get { return nextObjPath; } set { nextObjPath = value; OnPropertyChanged(); } }
 
         public WriteableBitmap Texture = null; // To add default
         public System.Windows.Media.Color[,] TextureColors;

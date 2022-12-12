@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\kubaw\\Desktop\\Studia\\Semestr 5\\Grafika Komputerowa 1\\Projekty\\Projekt 2\\3Dsimulatorv2\\3Dsimulator\\3Dsimulator\\3Dsimulator.csproj": {}
+    "C:\\Users\\kubaw\\Desktop\\AntyAvastVS\\3Dsimulatorv2\\3Dsimulator\\3Dsimulator\\3Dsimulator.csproj": {}
   },
   "projects": {
-    "C:\\Users\\kubaw\\Desktop\\Studia\\Semestr 5\\Grafika Komputerowa 1\\Projekty\\Projekt 2\\3Dsimulatorv2\\3Dsimulator\\3Dsimulator\\3Dsimulator.csproj": {
+    "C:\\Users\\kubaw\\Desktop\\AntyAvastVS\\3Dsimulatorv2\\3Dsimulator\\3Dsimulator\\3Dsimulator.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\kubaw\\Desktop\\Studia\\Semestr 5\\Grafika Komputerowa 1\\Projekty\\Projekt 2\\3Dsimulatorv2\\3Dsimulator\\3Dsimulator\\3Dsimulator.csproj",
+        "projectUniqueName": "C:\\Users\\kubaw\\Desktop\\AntyAvastVS\\3Dsimulatorv2\\3Dsimulator\\3Dsimulator\\3Dsimulator.csproj",
         "projectName": "3Dsimulator",
-        "projectPath": "C:\\Users\\kubaw\\Desktop\\Studia\\Semestr 5\\Grafika Komputerowa 1\\Projekty\\Projekt 2\\3Dsimulatorv2\\3Dsimulator\\3Dsimulator\\3Dsimulator.csproj",
+        "projectPath": "C:\\Users\\kubaw\\Desktop\\AntyAvastVS\\3Dsimulatorv2\\3Dsimulator\\3Dsimulator\\3Dsimulator.csproj",
         "packagesPath": "C:\\Users\\kubaw\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\kubaw\\Desktop\\Studia\\Semestr 5\\Grafika Komputerowa 1\\Projekty\\Projekt 2\\3Dsimulatorv2\\3Dsimulator\\3Dsimulator\\obj\\",
+        "outputPath": "C:\\Users\\kubaw\\Desktop\\AntyAvastVS\\3Dsimulatorv2\\3Dsimulator\\3Dsimulator\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_3Dsimulator"
         mc:Ignorable="d"
-        Title="Symulator 3D" ResizeMode="NoResize" Height="470" Width="800" Closing="Window_Closing" Closed="Window_Closed">
+        Title="Symulator 3D" ResizeMode="NoResize" Height="470" Width="1000" Closing="Window_Closing" Closed="Window_Closed">
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
@@ -85,7 +86,23 @@
             </Grid>
         </Grid>
 
-        <Image Name="shapeDisplay" Grid.Column="1"/> 
+        <Grid Grid.Column="1" Background="Gray">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <CheckBox Name="allowPaintingCheckbox" Grid.ColumnSpan="2" Content="Włącz kolorowanie" Click="allowPaintingCheckbox_Click"/>
+            <Button Name="addNextObj" Grid.Row="1" Content="Dodaj następną bryłę" Click="addNextObj_Click"/>
+
+        </Grid>
+
+        <Image Name="shapeDisplay" Grid.Column="2"/> 
 
     </Grid>
 </Window>

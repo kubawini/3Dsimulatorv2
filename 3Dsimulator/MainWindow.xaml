@@ -38,6 +38,7 @@
                 Margin="5" Click="openSimulatorButton_Click" IsEnabled="{Binding Path,Converter={StaticResource fileChosenConverter}}"/>
         <Button Name="sphereButton" Grid.Row="2" Grid.Column="0" Content="Kula" Margin="5" Click="sphereButton_Click"
                 />
+        <Button Name="torusButton" Content="Torus" Margin="5" Click="torusButton_Click"/>
     </Grid>
 
 

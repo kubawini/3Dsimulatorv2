@@ -64,5 +64,10 @@ namespace _3Dsimulator
         {
             appState.FilePath = "../../../Resources/Sphere.obj";
         }
+
+        private void torusButton_Click(object sender, RoutedEventArgs e)
+        {
+            appState.FilePath = "../../../Resources/Torus.obj";
+        }
     }
 }

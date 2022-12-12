@@ -16,6 +16,8 @@ namespace _3Dsimulator.Classes
 
         public static double w2x(double w)
         {
+            if (2 * w / width - 1 > 1) return 1;
+            else if (2 * w / width - 1 < -1) return -1;
             return 2 * w / width - 1;
         }
 
@@ -26,6 +28,8 @@ namespace _3Dsimulator.Classes
 
         public static double h2y(double h)
         {
+            if (2 * h / height - 1 < -1) return -1;
+            else if (2 * h / height - 1 > 1) return 1;
             return 2 * h / height - 1;
         }
 

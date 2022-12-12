@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_3Dsimulator"
         mc:Ignorable="d"
-        Title="Symulator 3D" ResizeMode="NoResize" Height="450" Width="800" Closing="Window_Closing" Closed="Window_Closed">
+        Title="Symulator 3D" ResizeMode="NoResize" Height="470" Width="800" Closing="Window_Closing" Closed="Window_Closed">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
@@ -27,6 +27,7 @@
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*"/>
@@ -79,6 +80,8 @@
                         <TextBlock TextWrapping="Wrap"> Użyj mapy wektorów</TextBlock>
                     </CheckBox>
                 </Grid>
+
+                <CheckBox Name="allowCloud" Content="Włącz chmurkę" Grid.Row="12" Grid.ColumnSpan="2" Click="allowCloud_Click"/>
             </Grid>
         </Grid>
 

@@ -1,0 +1,10 @@
+Cała interakcja z aplikacją odbywa się za pomocą myszki.
+
+- Na ekranie startowym wybierz odpowiedni plik obj lub wczytaj domyślną kulę/torusa
+
+- Modyfikuj współczynniki kd, ks, m i wysokość źródła światła za pomocą suwaka
+- Startuj/zatrzymaj ruch światła przyciskiem
+- Wybierz kolor obiektu/światła z rozwiajnej listy
+- włącz wyświetlanie siatki checkboxem
+- Wybierz typ interpolacji (radio buttons)
+- Załaduj teksturę/mapę wektorów normalnych

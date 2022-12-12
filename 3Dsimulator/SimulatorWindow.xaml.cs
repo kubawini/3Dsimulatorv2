@@ -33,6 +33,10 @@ namespace _3Dsimulator
 
         int spiralClickCounter = 0;
         DispatcherTimer dispatcherTimer = new DispatcherTimer();
+        DispatcherTimer chmurkaTimer = new DispatcherTimer();
+        Face cloud = new Face();
+        int tickerCounter = 0;
+        double cloudMove = 10;
         
 
         public SimulatorWindow(AppState aS)
@@ -41,9 +45,22 @@ namespace _3Dsimulator
             appState = aS;
             objShape = ObjReader.read(aS.FilePath);
             shapeDisplay.BeginInit();
-            drawer = new BitmapDrawer(objShape, shapeDisplay, appState);
+            drawer = new BitmapDrawer(objShape, shapeDisplay, appState, cloud);
             dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
             dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 40);
+
+            cloud.AddVertex(new Vertex(0.1, -0.1, 1.5));
+            cloud.AddVertex(new Vertex(0.2, 0, 1.5));
+            cloud.AddVertex(new Vertex(0.1, 0.1, 1.5));
+            cloud.AddVertex(new Vertex(-0.1, 0.1, 1.5));
+            cloud.AddVertex(new Vertex(-0.2, 0, 1.5));
+            cloud.AddVertex(new Vertex(-0.1, -0.1, 1.5));
+            cloud.CreateEdges();
+            cloud.setAET();
+
+            chmurkaTimer.Tick += new EventHandler(chmurkaTimer_Tick);
+            chmurkaTimer.Interval = new TimeSpan(0, 0, 0, 0, 40);
+            chmurkaTimer.Start();
 
             // Bindings
             var kdBinding = new Binding("kd");
@@ -101,6 +118,11 @@ namespace _3Dsimulator
             normalMapBinding.Source = appState;
             normalMapBinding.Mode = BindingMode.TwoWay;
             useNormalMapCheckbox.SetBinding(CheckBox.IsCheckedProperty, normalMapBinding);
+
+            var cloudBinding = new Binding("CloudAllowed");
+            cloudBinding.Source = appState;
+            cloudBinding.Mode = BindingMode.TwoWay;
+            allowCloud.SetBinding(CheckBox.IsCheckedProperty, cloudBinding);
         }
 
         private void kdSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => drawer.draw();
@@ -112,6 +134,7 @@ namespace _3Dsimulator
         private void gridCheckBox_Checked(object sender, RoutedEventArgs e) => drawer.draw();
         private void gridCheckBox_Unchecked(object sender, RoutedEventArgs e) => drawer.draw();
         private void colorInterpolation_Checked(object sender, RoutedEventArgs e) => drawer.draw();
+        private void allowCloud_Click(object sender, RoutedEventArgs e) => drawer.draw();
 
 
         private void startTimerButton_Click(object sender, RoutedEventArgs e)
@@ -129,8 +152,20 @@ namespace _3Dsimulator
             spiralClickCounter++;
         }
 
+        private void chmurkaTimer_Tick(object sender, EventArgs e)
+        {
+            if(appState.CloudAllowed)
+            {
+                tickerCounter = (tickerCounter + 1) % 10;
+                if (tickerCounter == 0) cloudMove *= -1;
+                cloud.MoveCloudHorizontally(cloudMove);
+                drawer.draw();
+            }      
+        }
+
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
+
             drawer.bitmap.FillEllipse((int)objShape.lightSource.X - 5, (int)objShape.lightSource.Y - 5,
                 (int)objShape.lightSource.X + 5, (int)objShape.lightSource.Y + 5, Colors.White);
             appState.Time += 0.1;
@@ -138,6 +173,9 @@ namespace _3Dsimulator
             if (objShape.r > 1.5) objShape.r = 0;
             objShape.lightSource.X = Geo.x2w(Math.Cos(appState.Time) * objShape.r);
             objShape.lightSource.Y = Geo.y2h(Math.Sin(appState.Time) * objShape.r);
+
+
+
             drawer.draw();
         }
 
@@ -201,5 +239,7 @@ namespace _3Dsimulator
         {
             mainWindow.ShowDialog();
         }
+
+        
     }
 }

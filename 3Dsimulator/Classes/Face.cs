@@ -20,6 +20,15 @@ namespace _3Dsimulator.Classes
         public NormalVector[,] normalVectors;
         public NormalVector[,] normalModifiedVectors;
 
+        public void MoveCloudHorizontally(double x)
+        {
+            foreach(Vertex v in Vertices)
+            {
+                v.X += x;
+            }
+            setAET();
+        }
+
         // COME BACK THERE - currently useless
         public void interpolateVectors()
         {

@@ -25,7 +25,9 @@ namespace _3Dsimulator.Classes
         private int width;
         private int height;
 
-        public BitmapDrawer(ObjShape ls, Image im, AppState aS)
+        public Face cloud;
+
+        public BitmapDrawer(ObjShape ls, Image im, AppState aS, Face c)
         { 
             appState = aS;
             loadedShape = ls;
@@ -35,6 +37,7 @@ namespace _3Dsimulator.Classes
             width = (int)(image.Source.Width);
             height = (int)image.Source.Height;
             bitmap.FillRectangle(0, 0, (int)width, (int)height, Colors.White);
+            cloud = c;
         }
 
         public static List<ETitem>[] CreateET(Face f, int h)
@@ -108,6 +111,34 @@ namespace _3Dsimulator.Classes
         public Color countColorVectorInterpolation(Face f, int x, int y)
         {
             return countColorVectorInterpolation(f, x, y, loadedShape.Io);
+        }
+
+
+        public void FillCloud(Face f, Color c)
+        {
+            int y = (int)f.ymin;
+            int yBase = y;
+
+            while (y <= (int)Math.Round(f.ymax))
+            {
+                // Drawing
+                int i = 0;
+                ETitem prev = null;
+                foreach (var el in f.AET[y - yBase])
+                {
+                    if (i % 2 == 1)
+                    {
+                        var a = 0;
+                        for (int x = (int)prev.xmin; x <= Math.Round(el.xmin); x++)
+                        {
+                            bitmap.SetPixel(x, y, c);
+                        }
+                    }
+                    prev = el;
+                    i++;
+                }
+                y++;
+            }
         }
 
         public void FillFace(Face f, Vertex LightSource)
@@ -288,6 +319,7 @@ namespace _3Dsimulator.Classes
         public void draw()
         {
             bitmap.Lock();
+            bitmap.FillRectangle(0, 0, width, height, Colors.White);
             FillObject();
             if (appState.GridEnabled)
             {
@@ -301,10 +333,37 @@ namespace _3Dsimulator.Classes
                     }
                 }
             }
+
+
+            if (appState.CloudAllowed && loadedShape.lightSource.Z > cloud.Vertices[0].Z)
+            {
+                Face shade = new Face();
+                foreach (var v in cloud.Vertices)
+                {
+                    if (loadedShape.lightSource.Z - v.Z != 0)
+                    {
+                        shade.AddVertex(new Vertex(Geo.w2x(loadedShape.lightSource.X + (v.X - loadedShape.lightSource.X) * loadedShape.lightSource.Z / (loadedShape.lightSource.Z - v.Z)),
+                            Geo.h2y(loadedShape.lightSource.Y + (v.Y - loadedShape.lightSource.Y) * loadedShape.lightSource.Z / (loadedShape.lightSource.Z - v.Z)), 0));
+                    }
+                    else
+                    {
+                        shade.AddVertex(new Vertex(0, 0, 0));
+                    }
+                }
+                shade.CreateEdges();
+                shade.setAET();
+                FillCloud(shade, Color.FromRgb(5,5,5));
+                FillCloud(cloud, Colors.White);
+            }
+
             bitmap.FillEllipse((int)loadedShape.lightSource.X - 5, (int)loadedShape.lightSource.Y - 5,
                 (int)loadedShape.lightSource.X + 5, (int)loadedShape.lightSource.Y + 5, loadedShape.Il);
             bitmap.DrawEllipse((int)loadedShape.lightSource.X - 5, (int)loadedShape.lightSource.Y - 5,
                 (int)loadedShape.lightSource.X + 5, (int)loadedShape.lightSource.Y + 5, 0);
+            if(appState.CloudAllowed && loadedShape.lightSource.Z <= cloud.Vertices[0].Z)
+            {
+                FillCloud(cloud, Colors.White);
+            }
             bitmap.Unlock();
         }
     }

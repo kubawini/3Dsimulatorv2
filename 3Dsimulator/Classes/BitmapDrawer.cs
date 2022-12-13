@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows;
+using System.Numerics;
 
 namespace _3Dsimulator.Classes
 {
@@ -362,8 +363,43 @@ namespace _3Dsimulator.Classes
                         var vc = f.Vertices.Count;
                         for (int i = 0; i < vc; i++)
                         {
-                            bitmap.DrawLine((int)f.Edges[i].V1.X, (int)(f.Edges[i].V1.Y),
-                                (int)(f.Edges[i].V2.X), (int)(f.Edges[i].V2.Y), Colors.Black);
+                            if (appState.RotatingAllowed)
+                            {
+                                float v1x = (float) f.Edges[i].V1.X * 2 / size;
+                                float v1y = (float) f.Edges[i].V1.Y * 2 / size;
+                                float v1z = (float) f.Edges[i].V1.Z * 2 / size;
+                                float v2x = (float) f.Edges[i].V2.X * 2 / size;
+                                float v2y = (float) f.Edges[i].V2.Y * 2 / size;
+                                float v2z = (float) f.Edges[i].V2.Z * 2 / size;
+
+                                Vector4 v1Start = new Vector4(v1x, v1y, v1z, 1);
+                                Vector4 v2Start = new Vector4(v2x, v2y, v2z, 1);
+
+                                Matrix4x4 rotation = Matrix4x4.CreateRotationX(appState.kat);
+
+                                Vector3 cameraPosition = new Vector3(1, 1, 1);
+                                Vector3 cameraTarget = new Vector3(0, 0, 0);
+                                Vector3 cameraUp = new Vector3(0, 0, 1);
+                                Matrix4x4 view = Matrix4x4.CreateLookAt(cameraPosition, cameraTarget, cameraUp);
+
+                                Matrix4x4 projection = Matrix4x4.CreatePerspectiveFieldOfView((float)(Math.PI/2), 1,100, 1500);
+
+                                var v1End = Vector4.Transform(Vector4.Transform(Vector4.Transform(v1Start, rotation), view), projection);
+                                var v2End = Vector4.Transform(Vector4.Transform(Vector4.Transform(v2Start, rotation), view), projection);
+
+                                int v1_x = (int)(v1End.X * (size/2) + (size/2));
+                                int v1_y = (int)(-v1End.Y * (size / 2) + (size / 2));
+                                int v2_x = (int)(v2End.X * (size/2) + (size/2));
+                                int v2_y = (int)(-v2End.Y * (size / 2) + (size / 2));
+                                if(v1_x<600 && v1_x>0 && v1_y < 600 && v1_y > 0 && v2_x < 600 && v2_x > 0 && v2_y < 600 && v2_y > 0)
+                                    bitmap.DrawLine(v1_x, v1_y, v2_x, v2_y, Colors.Black);
+
+                            }
+                            else
+                            {
+                                bitmap.DrawLine((int)f.Edges[i].V1.X, (int)(f.Edges[i].V1.Y),
+                                    (int)(f.Edges[i].V2.X), (int)(f.Edges[i].V2.Y), Colors.Black);
+                            }
                         }
                     }
                 }

@@ -34,6 +34,7 @@ namespace _3Dsimulator
         int spiralClickCounter = 0;
         DispatcherTimer dispatcherTimer = new DispatcherTimer();
         DispatcherTimer chmurkaTimer = new DispatcherTimer();
+        DispatcherTimer rotateTimer = new DispatcherTimer();
         Face cloud = new Face();
         int tickerCounter = 0;
         double cloudMove = 10;
@@ -61,6 +62,9 @@ namespace _3Dsimulator
             chmurkaTimer.Tick += new EventHandler(chmurkaTimer_Tick);
             chmurkaTimer.Interval = new TimeSpan(0, 0, 0, 0, 40);
             chmurkaTimer.Start();
+
+            rotateTimer.Tick += new EventHandler(rotateTimer_Tick);
+            rotateTimer.Interval = new TimeSpan(0, 0, 0, 0, 40);
 
             // Bindings
             var kdBinding = new Binding("kd");
@@ -128,6 +132,11 @@ namespace _3Dsimulator
             paintingBinding.Source = appState;
             paintingBinding.Mode = BindingMode.TwoWay;
             allowPaintingCheckbox.SetBinding(CheckBox.IsCheckedProperty, paintingBinding);
+
+            var rotatingBinding = new Binding("RotatingAllowed");
+            rotatingBinding.Source = appState;
+            rotatingBinding.Mode = BindingMode.TwoWay;
+            rotateCheckbox.SetBinding(CheckBox.IsCheckedProperty, rotatingBinding);
         }
 
         private void kdSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => drawer.draw();
@@ -142,6 +151,11 @@ namespace _3Dsimulator
         private void allowCloud_Click(object sender, RoutedEventArgs e) => drawer.draw();
         private void allowPaintingCheckbox_Click(object sender, RoutedEventArgs e) => drawer.draw();
 
+        private void rotateTimer_Tick(object sender, EventArgs e)
+        {
+            appState.kat += 0.1f;
+            drawer.draw();
+        }
 
         private void startTimerButton_Click(object sender, RoutedEventArgs e)
         {
@@ -259,6 +273,11 @@ namespace _3Dsimulator
                 drawer.addNewObj(ofd.FileName);
                 drawer.draw();
             }
+        }
+
+        private void rotateCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            rotateTimer.Start();
         }
     }
 }

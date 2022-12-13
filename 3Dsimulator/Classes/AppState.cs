@@ -52,8 +52,14 @@ namespace _3Dsimulator.Classes
         private string nextObjPath = "";
         public string NextObjPath { get { return nextObjPath; } set { nextObjPath = value; OnPropertyChanged(); } }
 
+        private bool rotatingAllowed = true;
+        public bool RotatingAllowed { get { return rotatingAllowed; } set { rotatingAllowed = value; OnPropertyChanged(); } }
+
+        public float kat = 0;
+
         public WriteableBitmap Texture = null; // To add default
         public System.Windows.Media.Color[,] TextureColors;
+
 
         public WriteableBitmap NormalMap = null; // To add default
 

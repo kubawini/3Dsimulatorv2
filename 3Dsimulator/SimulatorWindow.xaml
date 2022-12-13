@@ -90,6 +90,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -99,6 +100,7 @@
 
             <CheckBox Name="allowPaintingCheckbox" Grid.ColumnSpan="2" Content="Włącz kolorowanie" Click="allowPaintingCheckbox_Click"/>
             <Button Name="addNextObj" Grid.Row="1" Content="Dodaj następną bryłę" Click="addNextObj_Click"/>
+            <CheckBox Name="rotateCheckbox" Grid.Row="2" Content="Rotuj" Checked="rotateCheckbox_Checked"/>
 
         </Grid>
 

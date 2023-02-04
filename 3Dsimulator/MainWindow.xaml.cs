@@ -40,6 +40,11 @@ namespace _3Dsimulator
             pathBindingEnabledButton.Source = appState;
             pathBindingEnabledButton.Converter = new FileChosenConverter();
             openSimulatorButton.SetBinding(Button.IsEnabledProperty, pathBindingEnabledButton);
+
+            var newWindow = new SimulatorWindow(appState);
+            Application.Current.MainWindow = newWindow;
+            this.Close();
+            newWindow.ShowDialog();
         }
 
         private void selectPathButton_Click(object sender, RoutedEventArgs e)

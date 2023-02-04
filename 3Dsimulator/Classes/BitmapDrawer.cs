@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows;
 using System.Numerics;
+using System.Windows.Data;
 
 namespace _3Dsimulator.Classes
 {
@@ -25,6 +26,8 @@ namespace _3Dsimulator.Classes
 
         private AppState appState;
 
+        public ObjShape mainShape;
+
         public WriteableBitmap bitmap;
         private Image image;
 
@@ -33,10 +36,13 @@ namespace _3Dsimulator.Classes
 
         public Face cloud;
 
+        public double[,] zBuffer;
+
         public BitmapDrawer(ObjShape ls, Image im, AppState aS, Face c)
-        { 
+        {
             appState = aS;
             loadedShapes = new List<ObjShape>();
+            mainShape = ls;
             loadedShapes.Add(ls);
             image = im;
             bitmap = new WriteableBitmap(size, size, 96, 96, PixelFormats.Bgr32, null);
@@ -45,38 +51,94 @@ namespace _3Dsimulator.Classes
             height = (int)image.Source.Height;
             bitmap.FillRectangle(0, 0, (int)width, (int)height, Colors.White);
             cloud = c;
+            zBuffer = new double[width, height];
         }
 
-        public void addNewObj(string filePath)
+        public void add4spheres()
+        {
+            for(int i = 0; i < 4; i++)
+            {
+                addSphere("../../../Resources/Sphere.obj", 0.5, 0.5, 50, Colors.Red, i);
+            }
+        }
+
+        public void normalizeTorus(ObjShape torus)
+        {
+            foreach(var vertex in torus.Vertices)
+            {
+                vertex.X = (vertex.X - 0.5 * size) / 4 + 0.5 * size;
+                vertex.Y = (vertex.Y - 0.5 * size) / 4 + 0.5 * size;
+                vertex.Z = vertex.Z / 4;
+            }
+        }
+
+        public void addSphere(string filePath, double kd, double ks, int m, Color color, int nr)
         {
             var newObj = ObjReader.read(filePath);
-            
-            for(int i=0; i<loadedShapes.Count;i++)
+            newObj.kd = kd;
+            newObj.ks = ks;
+            newObj.m = m;
+            newObj.Io = color;
+
+            for(int i=0; i < newObj.Vertices.Count; i++)
             {
-                for(int j = 0; j < loadedShapes[i].Vertices.Count; j++)
-                {
-                    loadedShapes[i].Vertices[j].X = (int)((loadedShapes[i].Vertices[j].X - i * size / objCounter) * objCounter / (objCounter + 1) + size * i / (objCounter + 1));
-                    loadedShapes[i].Vertices[j].Y = (int)((loadedShapes[i].Vertices[j].Y - i * size / objCounter) * objCounter / (objCounter + 1) + size * i / (objCounter + 1));
-                    loadedShapes[i].Vertices[j].Z = (int)((loadedShapes[i].Vertices[j].Z - i * size / objCounter) * objCounter / (objCounter + 1) + size * i / (objCounter + 1));
-                }
-            }
-            for(int i=0; i<newObj.Vertices.Count;i++)
-            {
-                newObj.Vertices[i].X = (int)(newObj.Vertices[i].X / (objCounter + 1) + size * (objCounter) / (objCounter+1));
-                newObj.Vertices[i].Y = (int)(newObj.Vertices[i].Y / (objCounter + 1) + size * (objCounter) / (objCounter + 1));
-                newObj.Vertices[i].Z = (int)(newObj.Vertices[i].Z / (objCounter + 1) + size * (objCounter) / (objCounter + 1));
+                newObj.Vertices[i].X = (newObj.Vertices[i].X - 0.5f*size) / 4 + size * (2 *(nr<2?0:3)+1) / 8;
+                newObj.Vertices[i].Y = (newObj.Vertices[i].Y - 0.5f*size) / 4 + (2 * (nr%2==0?0:3) + 1) * size / 8;
+                newObj.Vertices[i].Z = newObj.Vertices[i].Z/4;
+                //newObj.Vertices[i].X = (int)(newObj.Vertices[i].X / (4 + 1) + size * (nr) / (4 + 1));
+                //newObj.Vertices[i].Y = (int)(newObj.Vertices[i].Y / (4 + 1) + size * (nr) / (4 + 1));
+                //newObj.Vertices[i].Z = (int)(newObj.Vertices[i].Z / (4 + 1) + size * (nr) / (4 + 1));
             }
 
             loadedShapes.Add(newObj);
         }
-          
+
+        public void addNewObj(string filePath, Slider kdSlider, Slider ksSlider, Slider mSlider)
+        {
+            // I should add scaling in case two objects are of different dimensions
+            var newObj = ObjReader.read(filePath);
+
+            //for(int i=0; i<loadedShapes.Count;i++)
+            //{
+            //    for(int j = 0; j < loadedShapes[i].Vertices.Count; j++)
+            //    {
+            //        loadedShapes[i].Vertices[j].X = (int)((loadedShapes[i].Vertices[j].X - i * size / objCounter) * objCounter / (objCounter + 1) + size * i / (objCounter + 1));
+            //        loadedShapes[i].Vertices[j].Y = (int)((loadedShapes[i].Vertices[j].Y - i * size / objCounter) * objCounter / (objCounter + 1) + size * i / (objCounter + 1));
+            //        loadedShapes[i].Vertices[j].Z = (int)((loadedShapes[i].Vertices[j].Z - i * size / objCounter) * objCounter / (objCounter + 1) + size * i / (objCounter + 1));
+            //    }
+            //}
+            //for(int i=0; i<newObj.Vertices.Count;i++)
+            //{
+            //    newObj.Vertices[i].X = (int)(newObj.Vertices[i].X / (objCounter + 1) + size * (objCounter) / (objCounter+1));
+            //    newObj.Vertices[i].Y = (int)(newObj.Vertices[i].Y / (objCounter + 1) + size * (objCounter) / (objCounter + 1));
+            //    newObj.Vertices[i].Z = (int)(newObj.Vertices[i].Z / (objCounter + 1) + size * (objCounter) / (objCounter + 1));
+            //}
+
+            var kdBinding = new Binding("kd");
+            kdBinding.Source = newObj;
+            kdBinding.Mode = BindingMode.TwoWay;
+            kdSlider.SetBinding(Slider.ValueProperty, kdBinding);
+
+            var ksBinding = new Binding("ks");
+            ksBinding.Source = newObj;
+            ksBinding.Mode = BindingMode.TwoWay;
+            ksSlider.SetBinding(Slider.ValueProperty, ksBinding);
+
+            var mBinding = new Binding("m");
+            mBinding.Source = newObj;
+            mBinding.Mode = BindingMode.TwoWay;
+            mSlider.SetBinding(Slider.ValueProperty, mBinding);
+
+            loadedShapes.Add(newObj);
+        }
+
 
         public static List<ETitem>[] CreateET(Face f, int h)
         {
             var ET = new List<ETitem>[h + 1];
-            
 
-            foreach(var e in f.Edges)
+
+            foreach (var e in f.Edges)
             {
                 if (e.ymin != e.ymax)
                 {
@@ -172,7 +234,7 @@ namespace _3Dsimulator.Classes
             }
         }
 
-        public void FillFace(Face f, Vertex LightSource, ObjShape objShape)
+        public void FillFace(Face f, Vertex LightSource, ObjShape objShape, Color col = new Color())
         {
             var colors = new Color[f.Vertices.Count];
             int y = (int)f.ymin;
@@ -182,138 +244,204 @@ namespace _3Dsimulator.Classes
             double mian, wv1, wv2, wv3;
             NormalVector nv;
 
+            
+
             for (int i = 0; i < f.Vertices.Count; i++)
             {
-                if (appState.TextureEnabled)
-                    if(appState.NormalMapEnabled)
-                        colors[i] = Geo.getVertexColor(f.Vertices[i], objShape, appState.TextureColors[(int)f.Vertices[i].X, (int)f.Vertices[i].Y],
-                            Geo.modifyNormalVector(f.Vertices[i].normalVector,appState,(int)f.Vertices[i].X,(int)f.Vertices[i].Y,this));
-                    else
-                        colors[i] = Geo.getVertexColor(f.Vertices[i], objShape, appState.TextureColors[(int)f.Vertices[i].X, (int)f.Vertices[i].Y]);
-                else
-                    if (appState.NormalMapEnabled)
-                        colors[i] = Geo.getVertexColor(f.Vertices[i], objShape, objShape.Io,
-                            Geo.modifyNormalVector(f.Vertices[i].normalVector, appState, (int)f.Vertices[i].X, (int)f.Vertices[i].Y, this));
-                    else
+            //    if (appState.TextureEnabled)
+            //        if(appState.NormalMapEnabled)
+            //            colors[i] = Geo.getVertexColor(f.Vertices[i], objShape, appState.TextureColors[(int)f.Vertices[i].X, (int)f.Vertices[i].Y],
+            //                Geo.modifyNormalVector(f.Vertices[i].normalVector,appState,(int)f.Vertices[i].X,(int)f.Vertices[i].Y,this));
+            //        else
+            //            colors[i] = Geo.getVertexColor(f.Vertices[i], objShape, appState.TextureColors[(int)f.Vertices[i].X, (int)f.Vertices[i].Y]);
+            //    else
+            //        if (appState.NormalMapEnabled)
+            //            colors[i] = Geo.getVertexColor(f.Vertices[i], objShape, objShape.Io,
+            //                Geo.modifyNormalVector(f.Vertices[i].normalVector, appState, (int)f.Vertices[i].X, (int)f.Vertices[i].Y, this));
+            //        else
                         colors[i] = Geo.getVertexColor(f.Vertices[i], objShape);
+            }
+
+            var equalColor = new Color();
+            if (f.Vertices.Count >= 3)
+            {
+                equalColor.R = (byte)(((uint)colors[0].R + (uint)colors[1].R + (uint)colors[2].R) / 3);
+                equalColor.G = (byte)(((uint)colors[0].G + (uint)colors[1].G + (uint)colors[2].G) / 3);
+                equalColor.B = (byte)(((uint)colors[0].B + (uint)colors[1].B + (uint)colors[2].B) / 3);
+                equalColor.A = 255;
+            }
+
+            if (appState.RotatingAllowed)
+            {
+                while (y <= (int)Math.Round(f.ymax))
+                {
+                    // Drawing
+                    int i = 0;
+                    ETitem prev = null;
+                    foreach (var el in f.AET[y - yBase])
+                    {
+                        if (i % 2 == 1)
+                        {
+                            var a = 0;
+                            for (int x = (int)prev.xmin; x <= Math.Round(el.xmin); x++)
+                            {
+                                double z = f.ZValue(x, y);
+                                if (z <= zBuffer[x, y])
+                                {
+                                    if(appState.EqualInterpolation)
+                                    {
+                                        col = equalColor;
+                                    }
+                                    else if (appState.ColorInterpolation)
+                                    {
+                                        // Interpolate colors
+                                        mian = (f.Vertices[1].Y - f.Vertices[2].Y) * (f.Vertices[0].X - f.Vertices[2].X) +
+                                            (f.Vertices[2].X - f.Vertices[1].X) * (f.Vertices[0].Y - f.Vertices[2].Y);
+                                        wv1 = ((f.Vertices[1].Y - f.Vertices[2].Y) * (x - f.Vertices[2].X) +
+                                            (f.Vertices[2].X - f.Vertices[1].X) * (y - f.Vertices[2].Y)) / mian;
+                                        wv2 = ((f.Vertices[2].Y - f.Vertices[0].Y) * (x - f.Vertices[2].X) +
+                                            (f.Vertices[0].X - f.Vertices[2].X) * (y - f.Vertices[2].Y)) / mian;
+                                        wv3 = 1 - wv1 - wv2;
+
+                                        R = (byte)(wv1 * colors[0].R + wv2 * colors[1].R + wv3 * colors[2].R);
+                                        G = (byte)(wv1 * colors[0].G + wv2 * colors[1].G + wv3 * colors[2].G);
+                                        B = (byte)(wv1 * colors[0].B + wv2 * colors[1].B + wv3 * colors[2].B);
+                                        col = Color.FromRgb(R, G, B);
+                                    }
+                                    else
+                                    {
+                                        col = countColorVectorInterpolation(f, x, y, objShape.Io, objShape);
+                                    }
+
+                                    bitmap.SetPixel(x, y, col);
+                                    zBuffer[x, y] = z;
+                                }
+                            }
+                        }
+                        prev = el;
+                        i++;
+                    }
+                    y++;
+                }
+                return;
             }
 
             if (appState.ColorInterpolation)
             {
-                    while (y <= (int)Math.Round(f.ymax))
+                while (y <= (int)Math.Round(f.ymax))
+                {
+                    // Drawing
+                    int i = 0;
+                    ETitem prev = null;
+                    foreach (var el in f.AET[y - yBase])
                     {
-                        // Drawing
-                        int i = 0;
-                        ETitem prev = null;
-                        foreach (var el in f.AET[y - yBase])
+                        if (i % 2 == 1)
                         {
-                            if (i % 2 == 1)
+                            var a = 0;
+                            for (int x = (int)prev.xmin; x <= Math.Round(el.xmin); x++)
                             {
-                                var a = 0;
-                                for (int x = (int)prev.xmin; x <= Math.Round(el.xmin); x++)
-                                {
-                                    mian = (f.Vertices[1].Y - f.Vertices[2].Y) * (f.Vertices[0].X - f.Vertices[2].X) +
-                                        (f.Vertices[2].X - f.Vertices[1].X) * (f.Vertices[0].Y - f.Vertices[2].Y);
-                                    wv1 = ((f.Vertices[1].Y - f.Vertices[2].Y) * (x - f.Vertices[2].X) +
-                                        (f.Vertices[2].X - f.Vertices[1].X) * (y - f.Vertices[2].Y)) / mian;
-                                    wv2 = ((f.Vertices[2].Y - f.Vertices[0].Y) * (x - f.Vertices[2].X) +
-                                        (f.Vertices[0].X - f.Vertices[2].X) * (y - f.Vertices[2].Y)) / mian;
-                                    wv3 = 1 - wv1 - wv2;
+                                mian = (f.Vertices[1].Y - f.Vertices[2].Y) * (f.Vertices[0].X - f.Vertices[2].X) +
+                                    (f.Vertices[2].X - f.Vertices[1].X) * (f.Vertices[0].Y - f.Vertices[2].Y);
+                                wv1 = ((f.Vertices[1].Y - f.Vertices[2].Y) * (x - f.Vertices[2].X) +
+                                    (f.Vertices[2].X - f.Vertices[1].X) * (y - f.Vertices[2].Y)) / mian;
+                                wv2 = ((f.Vertices[2].Y - f.Vertices[0].Y) * (x - f.Vertices[2].X) +
+                                    (f.Vertices[0].X - f.Vertices[2].X) * (y - f.Vertices[2].Y)) / mian;
+                                wv3 = 1 - wv1 - wv2;
 
-                                    R = (byte)(wv1 * colors[0].R + wv2 * colors[1].R + wv3 * colors[2].R);
-                                    G = (byte)(wv1 * colors[0].G + wv2 * colors[1].G + wv3 * colors[2].G);
-                                    B = (byte)(wv1 * colors[0].B + wv2 * colors[1].B + wv3 * colors[2].B);
-                                    c = Color.FromRgb(R, G, B);
-                                
-                                    bitmap.SetPixel(x, y, c);
-                                }
+                                R = (byte)(wv1 * colors[0].R + wv2 * colors[1].R + wv3 * colors[2].R);
+                                G = (byte)(wv1 * colors[0].G + wv2 * colors[1].G + wv3 * colors[2].G);
+                                B = (byte)(wv1 * colors[0].B + wv2 * colors[1].B + wv3 * colors[2].B);
+                                c = Color.FromRgb(R, G, B);
+
+                                bitmap.SetPixel(x, y, c);
                             }
-                            prev = el;
-                            i++;
                         }
-                        y++;
+                        prev = el;
+                        i++;
                     }
+                    y++;
+                }
             }
             else // VECTOR INTERPOLATION
             {
-                if(appState.NormalMapEnabled)
+                //if(appState.NormalMapEnabled)
+                //{
+                //    if (appState.TextureEnabled)
+                //    {
+                //        while (y <= (int)Math.Round(f.ymax))
+                //        {
+                //            // Drawing
+                //            int i = 0;
+                //            ETitem prev = null;
+                //            foreach (var el in f.AET[y - yBase])
+                //            {
+                //                if (i % 2 == 1)
+                //                {
+                //                    var a = 0;
+                //                    for (int x = (int)prev.xmin; x <= Math.Round(el.xmin); x++)
+                //                    {
+                //                        c = countColorVectorInterpolationMapping(f, x, y, appState.TextureColors[x, y], objShape);
+                //                        bitmap.SetPixel(x, y, c);
+                //                    }
+                //                }
+                //                prev = el;
+                //                i++;
+                //            }
+                //            y++;
+                //        }
+                //    }
+                //    else
+                //    {
+                //        while (y <= (int)Math.Round(f.ymax))
+                //        {
+                //            // Drawing
+                //            int i = 0;
+                //            ETitem prev = null;
+                //            foreach (var el in f.AET[y - yBase])
+                //            {
+                //                if (i % 2 == 1)
+                //                {
+                //                    var a = 0;
+                //                    for (int x = (int)prev.xmin; x <= Math.Round(el.xmin); x++)
+                //                    {
+                //                        c = countColorVectorInterpolationMapping(f, x, y, objShape.Io, objShape);
+                //                        bitmap.SetPixel(x, y, c);
+                //                    }
+                //                }
+                //                prev = el;
+                //                i++;
+                //            }
+                //            y++;
+                //        }
+                //    }
+                //}
+                //else
                 {
-                    if (appState.TextureEnabled)
-                    {
-                        while (y <= (int)Math.Round(f.ymax))
-                        {
-                            // Drawing
-                            int i = 0;
-                            ETitem prev = null;
-                            foreach (var el in f.AET[y - yBase])
-                            {
-                                if (i % 2 == 1)
-                                {
-                                    var a = 0;
-                                    for (int x = (int)prev.xmin; x <= Math.Round(el.xmin); x++)
-                                    {
-                                        c = countColorVectorInterpolationMapping(f, x, y, appState.TextureColors[x, y], objShape);
-                                        bitmap.SetPixel(x, y, c);
-                                    }
-                                }
-                                prev = el;
-                                i++;
-                            }
-                            y++;
-                        }
-                    }
-                    else
-                    {
-                        while (y <= (int)Math.Round(f.ymax))
-                        {
-                            // Drawing
-                            int i = 0;
-                            ETitem prev = null;
-                            foreach (var el in f.AET[y - yBase])
-                            {
-                                if (i % 2 == 1)
-                                {
-                                    var a = 0;
-                                    for (int x = (int)prev.xmin; x <= Math.Round(el.xmin); x++)
-                                    {
-                                        c = countColorVectorInterpolationMapping(f, x, y, objShape.Io, objShape);
-                                        bitmap.SetPixel(x, y, c);
-                                    }
-                                }
-                                prev = el;
-                                i++;
-                            }
-                            y++;
-                        }
-                    }
-                }
-                else
-                {
-                    if (appState.TextureEnabled)
-                    {
-                        while (y <= (int)Math.Round(f.ymax))
-                        {
-                            // Drawing
-                            int i = 0;
-                            ETitem prev = null;
-                            foreach (var el in f.AET[y - yBase])
-                            {
-                                if (i % 2 == 1)
-                                {
-                                    var a = 0;
-                                    for (int x = (int)prev.xmin; x <= Math.Round(el.xmin); x++)
-                                    {
-                                        c = countColorVectorInterpolation(f, x, y, appState.TextureColors[x,y], objShape);
-                                        bitmap.SetPixel(x, y, c);
-                                    }
-                                }
-                                prev = el;
-                                i++;
-                            }
-                            y++;
-                        }
-                    }
-                    else
+                    //if (appState.TextureEnabled)
+                    //{
+                    //    while (y <= (int)Math.Round(f.ymax))
+                    //    {
+                    //        // Drawing
+                    //        int i = 0;
+                    //        ETitem prev = null;
+                    //        foreach (var el in f.AET[y - yBase])
+                    //        {
+                    //            if (i % 2 == 1)
+                    //            {
+                    //                var a = 0;
+                    //                for (int x = (int)prev.xmin; x <= Math.Round(el.xmin); x++)
+                    //                {
+                    //                    c = countColorVectorInterpolation(f, x, y, appState.TextureColors[x,y], objShape);
+                    //                    bitmap.SetPixel(x, y, c);
+                    //                }
+                    //            }
+                    //            prev = el;
+                    //            i++;
+                    //        }
+                    //        y++;
+                    //    }
+                    //}
+                    //else
                     {
                         while (y <= (int)Math.Round(f.ymax))
                         {
@@ -343,100 +471,159 @@ namespace _3Dsimulator.Classes
 
         public void FillObject()
         {
-            foreach(var loadedShape in loadedShapes)
+            foreach (var loadedShape in loadedShapes)
                 foreach (var f in loadedShape.Faces)
-                    FillFace(f, loadedShape.lightSource, loadedShape);
+                {
+                    if (!appState.RotatingAllowed)
+                        FillFace(f, loadedShape.lightSource, loadedShape);
+                }
         }
 
         public void draw()
         {
             bitmap.Lock();
             bitmap.FillRectangle(0, 0, width, height, Colors.White);
-            if(appState.PaintingAllowed)
-                FillObject();
-            if (appState.GridEnabled)
+            //if(appState.PaintingAllowed)
+            //FillObject();
+
+            // czyszczenie bufora i ekranu!!!
+            for (int y = 0; y < height; y++)
             {
-                foreach (var loadedShape in loadedShapes)
+                for (int x = 0; x < width; x++)
                 {
-                    foreach (var f in loadedShape.Faces)
+                    zBuffer[x, y] = double.MaxValue;
+                }
+            }
+
+
+
+            int ind = 0;
+            foreach (var loadedShape in loadedShapes)
+            {
+                ind++;
+                foreach (var f in loadedShape.Faces)
+                {
+                    Face curr_face = new Face();
+                    var vc = f.Vertices.Count;
+                    for (int i = 0; i < vc; i++)
                     {
-                        var vc = f.Vertices.Count;
-                        for (int i = 0; i < vc; i++)
+                        if (appState.RotatingAllowed)
                         {
-                            if (appState.RotatingAllowed)
+                            float v1x = (float)(f.Edges[i].V1.X - size / 2) * 2 / size;
+                            float v1y = (float)(f.Edges[i].V1.Y - size / 2) * 2 / size;
+                            float v1z = (float)f.Edges[i].V1.Z * 2 / size;
+                            float v2x = (float)(f.Edges[i].V2.X - size / 2) * 2 / size;
+                            float v2y = (float)(f.Edges[i].V2.Y - size / 2) * 2 / size;
+                            float v2z = (float)f.Edges[i].V2.Z * 2 / size;
+
+                            Vector4 v1Start = new Vector4(v1x, v1y, v1z, 1);
+                            Vector4 v2Start = new Vector4(v2x, v2y, v2z, 1);
+                            Vector3 normalVectorStart =
+                                new Vector3((float)f.Vertices[i].normalVector.X, (float)f.Vertices[i].normalVector.Y,
+                                (float)f.Vertices[i].normalVector.Z);
+                            Matrix4x4 rotation = Matrix4x4.CreateRotationX(0);
+                            if(loadedShape==mainShape)
+                                rotation = Matrix4x4.CreateRotationX(appState.kat * (ind * (int)Math.Pow(-1, ind)));
+                            Vector3 normalVectorEnd = Vector3.TransformNormal(normalVectorStart, rotation);
+
+                            Matrix4x4 translate = Matrix4x4.CreateTranslation(new Vector3(0, appState.translate, 0));
+
+                            Vector3 cameraPosition = new Vector3(appState.XC, appState.YC, appState.ZC);
+                            Vector3 cameraTarget = new Vector3(0, 0, 0);
+                            Vector3 cameraUp = new Vector3(0, 0, 1);
+                            Matrix4x4 view = Matrix4x4.CreateLookAt(cameraPosition, cameraTarget, cameraUp);
+
+                            Matrix4x4 projection = Matrix4x4.CreatePerspectiveFieldOfView(appState.Fov, 1, 100, 1500);
+
+                            if (loadedShape == mainShape)
                             {
-                                float v1x = (float) f.Edges[i].V1.X * 2 / size;
-                                float v1y = (float) f.Edges[i].V1.Y * 2 / size;
-                                float v1z = (float) f.Edges[i].V1.Z * 2 / size;
-                                float v2x = (float) f.Edges[i].V2.X * 2 / size;
-                                float v2y = (float) f.Edges[i].V2.Y * 2 / size;
-                                float v2z = (float) f.Edges[i].V2.Z * 2 / size;
+                                v1Start = Vector4.Transform(v1Start, translate);
+                                v2Start = Vector4.Transform(v2Start, translate);
+                            }
 
-                                Vector4 v1Start = new Vector4(v1x, v1y, v1z, 1);
-                                Vector4 v2Start = new Vector4(v2x, v2y, v2z, 1);
+                            var v1End = Vector4.Transform(Vector4.Transform(Vector4.Transform(v1Start, rotation), view), projection);
+                            var v2End = Vector4.Transform(Vector4.Transform(Vector4.Transform(v2Start, rotation), view), projection);
 
-                                Matrix4x4 rotation = Matrix4x4.CreateRotationX(appState.kat);
+                            int v1_x = (int)(v1End.X * (size / 2) + (size / 2));
+                            int v1_y = (int)(-v1End.Y * (size / 2) + (size / 2));
+                            int v1_z = (int)(v1End.Z * (size / 2));
+                            int v2_x = (int)(v2End.X * (size / 2) + (size / 2));
+                            int v2_y = (int)(-v2End.Y * (size / 2) + (size / 2));
 
-                                Vector3 cameraPosition = new Vector3(1, 1, 1);
-                                Vector3 cameraTarget = new Vector3(0, 0, 0);
-                                Vector3 cameraUp = new Vector3(0, 0, 1);
-                                Matrix4x4 view = Matrix4x4.CreateLookAt(cameraPosition, cameraTarget, cameraUp);
 
-                                Matrix4x4 projection = Matrix4x4.CreatePerspectiveFieldOfView((float)(Math.PI/2), 1,100, 1500);
-
-                                var v1End = Vector4.Transform(Vector4.Transform(Vector4.Transform(v1Start, rotation), view), projection);
-                                var v2End = Vector4.Transform(Vector4.Transform(Vector4.Transform(v2Start, rotation), view), projection);
-
-                                int v1_x = (int)(v1End.X * (size/2) + (size/2));
-                                int v1_y = (int)(-v1End.Y * (size / 2) + (size / 2));
-                                int v2_x = (int)(v2End.X * (size/2) + (size/2));
-                                int v2_y = (int)(-v2End.Y * (size / 2) + (size / 2));
-                                if(v1_x<600 && v1_x>0 && v1_y < 600 && v1_y > 0 && v2_x < 600 && v2_x > 0 && v2_y < 600 && v2_y > 0)
+                            if (v1_x < 600 && v1_x > 0 && v1_y < 600 && v1_y > 0 && v2_x < 600 && v2_x > 0 && v2_y < 600 && v2_y > 0)
+                            {
+                                if (!appState.PaintingAllowed)
                                     bitmap.DrawLine(v1_x, v1_y, v2_x, v2_y, Colors.Black);
-
+                                Vertex v = new Vertex(v1End.X, -v1End.Y, v1End.Z);
+                                v.normalVector = new NormalVector(normalVectorEnd.X, normalVectorEnd.Y, normalVectorEnd.Z);
+                                curr_face.AddVertex(v);
+                                //curr_face.AddVertex(new Vertex(v1_x, v1_y, v1_z));
                             }
                             else
                             {
-                                bitmap.DrawLine((int)f.Edges[i].V1.X, (int)(f.Edges[i].V1.Y),
-                                    (int)(f.Edges[i].V2.X), (int)(f.Edges[i].V2.Y), Colors.Black);
+                                // Dodać takie wczytywanie trójkątów żeby działało jak wyjdziemy za canvas
+                                // .
+                                // .
+                                // .
+                                // Albo i nie xD
                             }
-                        }
-                    }
-                }
-            }
 
-            foreach (var loadedShape in LoadedShapes)
-            {
-                if (appState.CloudAllowed && loadedShape.lightSource.Z > cloud.Vertices[0].Z)
-                {
-                    Face shade = new Face();
-                    foreach (var v in cloud.Vertices)
-                    {
-                        if (loadedShape.lightSource.Z - v.Z != 0)
-                        {
-                            shade.AddVertex(new Vertex(Geo.w2x(loadedShape.lightSource.X + (v.X - loadedShape.lightSource.X) * loadedShape.lightSource.Z / (loadedShape.lightSource.Z - v.Z)),
-                                Geo.h2y(loadedShape.lightSource.Y + (v.Y - loadedShape.lightSource.Y) * loadedShape.lightSource.Z / (loadedShape.lightSource.Z - v.Z)), 0));
                         }
                         else
                         {
-                            shade.AddVertex(new Vertex(0, 0, 0));
+                            bitmap.DrawLine((int)f.Edges[i].V1.X, (int)(f.Edges[i].V1.Y),
+                                (int)(f.Edges[i].V2.X), (int)(f.Edges[i].V2.Y), Colors.Black);
                         }
                     }
-                    shade.CreateEdges();
-                    shade.setAET();
-                    FillCloud(shade, Color.FromRgb(5, 5, 5));
-                    FillCloud(cloud, Colors.White);
-                }
-            }
 
-            bitmap.FillEllipse((int)loadedShapes[0].lightSource.X - 5, (int)loadedShapes[0].lightSource.Y - 5,
-                (int)loadedShapes[0].lightSource.X + 5, (int)loadedShapes[0].lightSource.Y + 5, loadedShapes[0].Il);
-            bitmap.DrawEllipse((int)loadedShapes[0].lightSource.X - 5, (int)loadedShapes[0].lightSource.Y - 5,
-                (int)loadedShapes[0].lightSource.X + 5, (int)loadedShapes[0].lightSource.Y + 5, 0);
-            if(appState.CloudAllowed && loadedShapes[0].lightSource.Z <= cloud.Vertices[0].Z)
-            {
-                FillCloud(cloud, Colors.White);
+
+                    if (appState.PaintingAllowed && curr_face.Vertices.Count > 0)
+                    {
+                        curr_face.CreateEdges();
+                        curr_face.setAET();
+                        curr_face.interpolateVectors();
+                        FillFace(curr_face, loadedShape.lightSource, loadedShape,
+                            Color.FromRgb((byte)((ind * 50) % 256), (byte)((ind * 50) % 256), (byte)((ind * 50) % 256)));
+                    }
+                
+            
+         
             }
+        }
+
+        //foreach (var loadedShape in LoadedShapes)
+        //{
+        //    if (appState.CloudAllowed && loadedShape.lightSource.Z > cloud.Vertices[0].Z)
+        //    {
+        //        Face shade = new Face();
+        //        foreach (var v in cloud.Vertices)
+        //        {
+        //            if (loadedShape.lightSource.Z - v.Z != 0)
+        //            {
+        //                shade.AddVertex(new Vertex(Geo.w2x(loadedShape.lightSource.X + (v.X - loadedShape.lightSource.X) * loadedShape.lightSource.Z / (loadedShape.lightSource.Z - v.Z)),
+        //                    Geo.h2y(loadedShape.lightSource.Y + (v.Y - loadedShape.lightSource.Y) * loadedShape.lightSource.Z / (loadedShape.lightSource.Z - v.Z)), 0));
+        //            }
+        //            else
+        //            {
+        //                shade.AddVertex(new Vertex(0, 0, 0));
+        //            }
+        //        }
+        //        shade.CreateEdges();
+        //        shade.setAET();
+        //        FillCloud(shade, Color.FromRgb(5, 5, 5));
+        //        FillCloud(cloud, Colors.White);
+        //    }
+        //}
+
+        //bitmap.FillEllipse((int)loadedShapes[0].lightSource.X - 5, (int)loadedShapes[0].lightSource.Y - 5,
+        //        (int)loadedShapes[0].lightSource.X + 5, (int)loadedShapes[0].lightSource.Y + 5, loadedShapes[0].Il);
+        //    bitmap.DrawEllipse((int)loadedShapes[0].lightSource.X - 5, (int)loadedShapes[0].lightSource.Y - 5,
+        //        (int)loadedShapes[0].lightSource.X + 5, (int)loadedShapes[0].lightSource.Y + 5, 0);
+            //if(appState.CloudAllowed && loadedShapes[0].lightSource.Z <= cloud.Vertices[0].Z)
+            //{
+            //    FillCloud(cloud, Colors.White);
+            //}
             bitmap.Unlock();
         }
     }

@@ -67,6 +67,19 @@ namespace _3Dsimulator.Classes
                 y++;
             }
         }
+
+        public double ZValue(int x, int y)
+        {
+            var mian = (Vertices[1].Y - Vertices[2].Y) * (Vertices[0].X - Vertices[2].X) +
+                                            (Vertices[2].X - Vertices[1].X) * (Vertices[0].Y - Vertices[2].Y);
+            var wv1 = ((Vertices[1].Y - Vertices[2].Y) * (x - Vertices[2].X) +
+                (Vertices[2].X - Vertices[1].X) * (y - Vertices[2].Y)) / mian;
+            var wv2 = ((Vertices[2].Y - Vertices[0].Y) * (x - Vertices[2].X) +
+                (Vertices[0].X - Vertices[2].X) * (y - Vertices[2].Y)) / mian;
+            var wv3 = 1 - wv1 - wv2;
+            double z = wv1 * Vertices[0].Z + wv2 * Vertices[1].Z + wv3 * Vertices[2].Z;
+            return z;
+        }
         
         public void setAET()
         {

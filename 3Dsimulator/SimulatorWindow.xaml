@@ -5,11 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_3Dsimulator"
         mc:Ignorable="d"
-        Title="Symulator 3D" ResizeMode="NoResize" Height="470" Width="1000" Closing="Window_Closing" Closed="Window_Closed">
+        Title="Symulator 3D" ResizeMode="NoResize" Height="770" Width="1000" Closing="Window_Closing" Closed="Window_Closed">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
-            <ColumnDefinition Width="200"/>
+            <!--ColumnDefinition Width="200"/>-->
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -21,21 +21,21 @@
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
-                    <RowDefinition Height="40"/>
-                    <RowDefinition Height="40"/>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <!--<RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
-                    <RowDefinition Height="40"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>-->
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*"/>
+                    <!--<ColumnDefinition Width="3*"/>-->
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Slider Name="kdSlider" Minimum="0" Maximum="1" Margin="5" ValueChanged="kdSlider_ValueChanged"/>
+                <!--<Slider Name="kdSlider" Minimum="0" Maximum="1" Margin="5" ValueChanged="kdSlider_ValueChanged"/>
                 <TextBlock Text="kd (0-1)" Grid.Column="1" TextAlignment="Center"/>
 
                 <Slider Name="ksSlider" Grid.Row="1" Minimum="0" Maximum="1" Margin="5" ValueChanged="ksSlider_ValueChanged"/>
@@ -56,11 +56,21 @@
                 <TextBlock Text="Kolor Światła" Grid.Row="6" Grid.Column="1" TextWrapping="Wrap"/>
 
                 <CheckBox Name="gridCheckBox" Grid.Row="7" Margin="5" Content="Włącz siatkę" Checked="gridCheckBox_Checked" Unchecked="gridCheckBox_Unchecked"/>
+                -->
+                <RadioButton GroupName="interpolation" Name="equalInterpolation" Grid.Row="0" Margin="5" Content="Cieniowanie stałe" Checked="equalInterpolation_Checked"/>
+                <RadioButton GroupName="interpolation" Name="colorInterpolation" Grid.Row="1" Margin="5" Content="Cieniowanie Gourauda" Checked="colorInterpolation_Checked"/>
+                <RadioButton GroupName="interpolation" Name="vectorInterpolation" Grid.Row="2" Margin="5" Content="Cieniowanie Phonga" Checked="vectorInterpolation_Checked"/>
 
-                <RadioButton Name="colorInterpolation" Grid.Row="8" Margin="5" Content="Interpolacja kolorów" Checked="colorInterpolation_Checked"/>
-                <RadioButton Name="vectorInterpolation" Grid.Row="9" Margin="5" Content="Interpolacja wektorów" Checked="vectorInterpolation_Checked"/>
+                <CheckBox Name="fogCheckBox" Grid.Row="3" Margin="5" Content="Mgła"/>
+                <CheckBox Name="dayNightCheckbox" Grid.Row="4" Margin="5" Content="Dzień/Noc"/>
+                <CheckBox Name="vibrationsCheckbox" Grid.Row="5" Margin="5" Content="Drgania"/>
 
-                <Grid Grid.Row="10" Grid.ColumnSpan="2">
+                <RadioButton GroupName="camera" Name="camera1RadioButton" Grid.Row="6" Margin="5" Content="Kamera 1"/>
+                <RadioButton GroupName="camera" Name="camera2RadioButton" Grid.Row="7" Margin="5" Content="Kamera 2"/>
+                <RadioButton GroupName="camera" Name="camera3RadioButton" Grid.Row="8" Margin="5" Content="Kamera 3"/>
+
+                <Button Name="startButton" Grid.Row="9" Content="Start" Click="startButton_Click"/>
+                <!--<Grid Grid.Row="10" Grid.ColumnSpan="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
@@ -83,11 +93,16 @@
                 </Grid>
 
                 <CheckBox Name="allowCloud" Content="Włącz chmurkę" Grid.Row="12" Grid.ColumnSpan="2" Click="allowCloud_Click"/>
+            -->
             </Grid>
         </Grid>
 
-        <Grid Grid.Column="1" Background="Gray">
+        <!--<Grid Grid.Column="1" Background="Gray">
             <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
@@ -101,8 +116,26 @@
             <CheckBox Name="allowPaintingCheckbox" Grid.ColumnSpan="2" Content="Włącz kolorowanie" Click="allowPaintingCheckbox_Click"/>
             <Button Name="addNextObj" Grid.Row="1" Content="Dodaj następną bryłę" Click="addNextObj_Click"/>
             <CheckBox Name="rotateCheckbox" Grid.Row="2" Content="Rotuj" Checked="rotateCheckbox_Checked"/>
+            <Slider Name="FOVslider" Grid.Row="3" Minimum="0.15" Maximum="3"/>
+            <Slider Name="xCameraSlider" Grid.Row="4" Minimum="-1" Maximum="1"/>
+            <Slider Name="yCameraSlider" Grid.Row="5" Minimum="-1" Maximum="1"/>
+            <Slider Name="zCameraSlider" Grid.Row="6" Minimum="1" Maximum="10"/>
+            <TextBlock Grid.Row="3" Grid.Column="1">
+                FOV
+            </TextBlock>
 
-        </Grid>
+            <TextBlock Grid.Row="4" Grid.Column="1">
+                xCamera
+            </TextBlock>
+
+            <TextBlock Grid.Row="5" Grid.Column="1">
+                yCamera
+            </TextBlock>
+
+            <TextBlock Grid.Row="6" Grid.Column="1">
+                zCamera
+            </TextBlock>
+        </Grid>-->
 
         <Image Name="shapeDisplay" Grid.Column="2"/> 
 

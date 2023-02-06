@@ -69,6 +69,7 @@ namespace _3Dsimulator.Classes
                 vertex.X = (vertex.X - 0.5 * size) / 4 + 0.5 * size;
                 vertex.Y = (vertex.Y - 0.5 * size) / 4 + 0.5 * size;
                 vertex.Z = vertex.Z / 4;
+                //vertex.Z -= vertex.Z / 8;
             }
         }
 
@@ -316,11 +317,22 @@ namespace _3Dsimulator.Classes
 
                                     if(appState.Fog)
                                     {
-                                        int r = (int)(((int)col.R) + 255 * fogValue /4);
+                                        mian = (f.Vertices[1].Y - f.Vertices[2].Y) * (f.Vertices[0].X - f.Vertices[2].X) +
+                                            (f.Vertices[2].X - f.Vertices[1].X) * (f.Vertices[0].Y - f.Vertices[2].Y);
+                                        wv1 = ((f.Vertices[1].Y - f.Vertices[2].Y) * (x - f.Vertices[2].X) +
+                                            (f.Vertices[2].X - f.Vertices[1].X) * (y - f.Vertices[2].Y)) / mian;
+                                        wv2 = ((f.Vertices[2].Y - f.Vertices[0].Y) * (x - f.Vertices[2].X) +
+                                            (f.Vertices[0].X - f.Vertices[2].X) * (y - f.Vertices[2].Y)) / mian;
+                                        wv3 = 1 - wv1 - wv2;
+
+                                        int r = (int)(((int)col.R) + (wv1 * f.Vertices[0].fogValue +
+                                            wv2 * f.Vertices[1].fogValue + wv3 * f.Vertices[2].fogValue)*255/4);
                                         if (r > 255) r = 255;
-                                        int g = (int)(((int)col.G) + 255 * fogValue /4);
+                                        int g = (int)(((int)col.G) + (wv1 * f.Vertices[0].fogValue +
+                                            wv2 * f.Vertices[1].fogValue + wv3 * f.Vertices[2].fogValue) * 255/4);
                                         if (g > 255) g = 255;
-                                        int b = (int)(((int)col.B) + 255 * fogValue /4);
+                                        int b = (int)(((int)col.B) + (wv1 * f.Vertices[0].fogValue +
+                                            wv2 * f.Vertices[1].fogValue + wv3 * f.Vertices[2].fogValue) * 255/4);
                                         if (b > 255) b = 255;
                                         col = Color.FromRgb((byte)r, (byte)g, (byte)b);
                                     }
@@ -540,12 +552,9 @@ namespace _3Dsimulator.Classes
                             float v2y = (float)(f.Edges[i].V2.Y - size / 2) * 2 / size;
                             float v2z = (float)f.Edges[i].V2.Z * 2 / size;
 
-                            if (i == 0)
-                            {
                                 fogValue = (v1x - appState.XC) * (v1x - appState.XC) +
                                     (v1y - appState.YC) * (v1y - appState.YC) + (v1z - appState.ZC) * (v1z - appState.ZC);
                                 fogValue *= appState.fogWspolczynnik;
-                            }
 
                             
 
@@ -623,6 +632,7 @@ namespace _3Dsimulator.Classes
                                //     bitmap.DrawLine(v1_x, v1_y, v2_x, v2_y, Colors.Black);
                                 Vertex v = new Vertex(v1End.X, -v1End.Y, v1End.Z);
                                 v.normalVector = new NormalVector(normalVectorEnd.X, normalVectorEnd.Y, normalVectorEnd.Z);
+                                v.fogValue = fogValue;
                                 curr_face.AddVertex(v);
                                 //curr_face.AddVertex(new Vertex(v1_x, v1_y, v1_z));
                             }

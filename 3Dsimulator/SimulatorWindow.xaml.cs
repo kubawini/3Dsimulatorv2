@@ -368,10 +368,20 @@ namespace _3Dsimulator
 
         private void startButton_Click(object sender, RoutedEventArgs e)
         {
-            rotateTimer.Start();
+            if (startCounter % 2 == 0)
+            {
+                rotateTimer.Start();
+                startButton.Content = "Stop";
+            }
+            else
+            {
+                rotateTimer.Stop();
+                startButton.Content = "Start";
+            }
+            startCounter++;
         }
 
-
+        int startCounter = 0;
 
         private void camera1RadioButton_Checked(object sender, RoutedEventArgs e)
         {

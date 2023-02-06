@@ -12,6 +12,8 @@ namespace _3Dsimulator.Classes
         public double Y;
         public double Z;
 
+        public float fogValue = 0;
+
         public NormalVector normalVector = new NormalVector(0,0,0);
 
         public Vertex(double x, double y, double z)

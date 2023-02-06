@@ -556,7 +556,6 @@ namespace _3Dsimulator.Classes
                                     (v1y - appState.YC) * (v1y - appState.YC) + (v1z - appState.ZC) * (v1z - appState.ZC);
                                 fogValue *= appState.fogWspolczynnik;
 
-                            
 
 
                             Vector4 v1Start = new Vector4(v1x, v1y, v1z, 1);
@@ -565,8 +564,11 @@ namespace _3Dsimulator.Classes
                                 new Vector3((float)f.Vertices[i].normalVector.X, (float)f.Vertices[i].normalVector.Y,
                                 (float)f.Vertices[i].normalVector.Z);
                             Matrix4x4 rotation = Matrix4x4.CreateRotationX(0);
-                            if(loadedShape==mainShape)
-                                rotation = Matrix4x4.CreateRotationX(appState.kat * (ind * (int)Math.Pow(-1, ind)));
+                            if (loadedShape == mainShape)
+                            {
+                                rotation = Matrix4x4.CreateRotationX(appState.kat * (ind * (int)Math.Pow(-1, ind)),
+                                    new Vector3(0, appState.translate, 0));
+                            }
                             Vector3 normalVectorEnd = Vector3.TransformNormal(normalVectorStart, rotation);
 
                             Matrix4x4 translate = Matrix4x4.CreateTranslation(new Vector3(0, appState.translate, 0));
@@ -663,8 +665,7 @@ namespace _3Dsimulator.Classes
                         FillFace(curr_face, real_face, loadedShape,
                             Color.FromRgb((byte)((ind * 50) % 256), (byte)((ind * 50) % 256), (byte)((ind * 50) % 256)), fogValue);
                     }
-                
-            
+
          
             }
         }

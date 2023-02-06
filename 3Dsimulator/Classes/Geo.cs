@@ -105,11 +105,11 @@ namespace _3Dsimulator.Classes
 
                 if (cosVR < 0) cosVR = 0;
                 Red += ((os.Il.R * c.R / 255) * (os.kd * cosNL + os.ks * Math.Pow(cosVR, os.m)));
-                if (Red > 255) bRed = 255;
+                if (Red > 255) Red = 255;
                 Green += ((os.Il.G * c.G / 255) * (os.kd * cosNL + os.ks * Math.Pow(cosVR, os.m)));
-                if (Green > 255) bGreen = 255;
+                if (Green > 255) Green = 255;
                 Blue += ((os.Il.B * c.B / 255) * (os.kd * cosNL + os.ks * Math.Pow(cosVR, os.m)));
-                if (Blue > 255) bBlue = 255;
+                if (Blue > 255) Blue = 255;
             }
 
             bRed = (byte)Red;

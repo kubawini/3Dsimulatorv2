@@ -92,7 +92,11 @@ namespace _3Dsimulator.Classes
 
         public WriteableBitmap NormalMap = null; // To add default
 
+        public float fogWspolczynnik = 0;
+        public float nocWspolczynnik = 1;
 
+        public float fogSign = 1;
+        public float nocSign = 1;
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)

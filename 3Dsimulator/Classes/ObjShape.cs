@@ -42,7 +42,7 @@ namespace _3Dsimulator.Classes
         public ObjShape()
         {
             _lightSources.Add(new LightSource(0, 0, 2));
-            //_lightSources.Add(new LightSource(2000, 2000, 0));
+            _lightSources.Add(new LightSource(2000, 2000, 0));
         }
 
         public void AddVertex(Vertex v)

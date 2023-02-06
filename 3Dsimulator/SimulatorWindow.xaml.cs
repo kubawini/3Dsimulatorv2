@@ -35,6 +35,9 @@ namespace _3Dsimulator
         //DispatcherTimer dispatcherTimer = new DispatcherTimer();
         //DispatcherTimer chmurkaTimer = new DispatcherTimer();
         DispatcherTimer rotateTimer = new DispatcherTimer();
+        DispatcherTimer fogTimer = new DispatcherTimer();
+        DispatcherTimer nocTimer = new DispatcherTimer();
+       
         Face cloud = new Face();
         int roadInt = 1;
         //int tickerCounter = 0;
@@ -68,6 +71,13 @@ namespace _3Dsimulator
 
             rotateTimer.Tick += new EventHandler(rotateTimer_Tick);
             rotateTimer.Interval = new TimeSpan(0, 0, 0, 0, 40);
+
+
+            fogTimer.Tick += new EventHandler(fogTimer_Tick);
+            fogTimer.Interval = new TimeSpan(0, 0, 0, 0, 40);
+
+            nocTimer.Tick += new EventHandler(nocTimer_Tick);
+            nocTimer.Interval = new TimeSpan(0, 0, 0, 0, 40);
 
             // Bindings
             //var kdBinding = new Binding("kd");
@@ -126,15 +136,17 @@ namespace _3Dsimulator
             vibrationsBinding.Mode = BindingMode.TwoWay;
             vibrationsCheckbox.SetBinding(CheckBox.IsCheckedProperty, vibrationsBinding);
 
-            var fogBinding = new Binding("Fog");
-            fogBinding.Source = appState;
-            fogBinding.Mode = BindingMode.TwoWay;
-            fogCheckBox.SetBinding(CheckBox.IsCheckedProperty, fogBinding);
+            //var fogBinding = new Binding("Fog");
+            //fogBinding.Source = appState;
+            //fogBinding.Mode = BindingMode.TwoWay;
+            //fogCheckBox.SetBinding(CheckBox.IsCheckedProperty, fogBinding);
+            appState.Fog = true;
 
-            var nightBinding = new Binding("Night");
-            nightBinding.Source = appState;
-            nightBinding.Mode = BindingMode.TwoWay;
-            dayNightCheckbox.SetBinding(CheckBox.IsCheckedProperty, nightBinding);
+            //var nightBinding = new Binding("Night");
+            //nightBinding.Source = appState;
+            //nightBinding.Mode = BindingMode.TwoWay;
+            //dayNightCheckbox.SetBinding(CheckBox.IsCheckedProperty, nightBinding);
+            appState.Night = true;
 
             //var textureBinding = new Binding("TextureEnabled");
             //textureBinding.Source = appState;
@@ -194,7 +206,30 @@ namespace _3Dsimulator
         private void allowCloud_Click(object sender, RoutedEventArgs e) => drawer.draw();
         private void allowPaintingCheckbox_Click(object sender, RoutedEventArgs e) => drawer.draw();
 
-        private void rotateTimer_Tick(object sender, EventArgs e)
+        private void fogTimer_Tick(object sender, EventArgs e)
+        {
+            appState.fogWspolczynnik += 0.1f * appState.fogSign;
+            
+            if(appState.fogWspolczynnik > 1 || appState.fogWspolczynnik < 0) fogTimer.Stop();
+            if (appState.fogWspolczynnik < 0) appState.fogWspolczynnik = 0;
+            drawer.draw();
+        }
+
+        private void nocTimer_Tick(object sender, EventArgs e)
+        {
+            appState.nocWspolczynnik -= appState.nocSign * 0.1f;
+            if(appState.nocWspolczynnik < 0.3f)
+            {
+                nocTimer.Stop();
+            }
+            if(appState.nocWspolczynnik > 1)
+            {
+                appState.nocWspolczynnik = 1;
+                nocTimer.Stop();
+            }
+            drawer.draw();
+        }
+            private void rotateTimer_Tick(object sender, EventArgs e)
         {
             appState.kat += 0.1f;
             appState.translate += 0.02f * roadInt;
@@ -381,11 +416,17 @@ namespace _3Dsimulator
 
         private void fogCheckBox_Click(object sender, RoutedEventArgs e)
         {
+            fogTimer.Start();
+            if (fogCheckBox.IsChecked == true) appState.fogSign = 1;
+            else appState.fogSign = -1;
             drawer.draw();
         }
 
         private void dayNightCheckbox_Click(object sender, RoutedEventArgs e)
         {
+            nocTimer.Start();
+            if (dayNightCheckbox.IsChecked == true) appState.nocSign = 1;
+            else appState.nocSign= -1;
             drawer.draw();
         }
     }

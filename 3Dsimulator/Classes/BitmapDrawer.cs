@@ -173,13 +173,13 @@ namespace _3Dsimulator.Classes
                 wv1 * f.Vertices[0].normalVector.Z + wv2 * f.Vertices[1].normalVector.Z + wv3 * f.Vertices[2].normalVector.Z);
         }
 
-        public Color countColorVectorInterpolation(Face f, int x, int y, Color c1, ObjShape objShape)
+        public Color countColorVectorInterpolation(Face f, Face realFace, int x, int y, Color c1, ObjShape objShape)
         {
             double wv1, wv2, wv3;
             (wv1, wv2, wv3) = countWVs(f, x, y);
-            var nv = countNV(f, wv1, wv2, wv3);
+            var nv = countNV(realFace, wv1, wv2, wv3);
 
-            Vertex v = new Vertex(Geo.w2x(x), Geo.h2y(y), wv1 * Geo.p2z(f.Vertices[0].Z) + wv2 * Geo.p2z(f.Vertices[1].Z) + wv3 * Geo.p2z(f.Vertices[2].Z)); // To change z
+            Vertex v = new Vertex(-Geo.w2x(x), Geo.h2y(y), wv1 * Geo.p2z(realFace.Vertices[0].Z) + wv2 * Geo.p2z(realFace.Vertices[1].Z) + wv3 * Geo.p2z(realFace.Vertices[2].Z)); // To change z
             v.AddNormalVector(nv);
             var c = Geo.getVertexColor(v, objShape, c1, appState);
             return c;
@@ -201,9 +201,9 @@ namespace _3Dsimulator.Classes
         }
 
 
-        public Color countColorVectorInterpolation(Face f, int x, int y, ObjShape objShape)
+        public Color countColorVectorInterpolation(Face f, Face realFace, int x, int y, ObjShape objShape)
         {
-            return countColorVectorInterpolation(f, x, y, objShape.Io, objShape);
+            return countColorVectorInterpolation(f, realFace, x, y, objShape.Io, objShape);
         }
 
 
@@ -234,9 +234,9 @@ namespace _3Dsimulator.Classes
             }
         }
 
-        public void FillFace(Face f, ObjShape objShape, Color col = new Color(), float fogValue = 0)
+        public void FillFace(Face f, Face realFace, ObjShape objShape, Color col = new Color(), float fogValue = 0)
         {
-            var colors = new Color[f.Vertices.Count];
+            var colors = new Color[realFace.Vertices.Count];
             int y = (int)f.ymin;
             int yBase = y;
             Color c;
@@ -246,7 +246,7 @@ namespace _3Dsimulator.Classes
 
             
 
-            for (int i = 0; i < f.Vertices.Count; i++)
+            for (int i = 0; i < realFace.Vertices.Count; i++)
             {
             //    if (appState.TextureEnabled)
             //        if(appState.NormalMapEnabled)
@@ -259,11 +259,11 @@ namespace _3Dsimulator.Classes
             //            colors[i] = Geo.getVertexColor(f.Vertices[i], objShape, objShape.Io,
             //                Geo.modifyNormalVector(f.Vertices[i].normalVector, appState, (int)f.Vertices[i].X, (int)f.Vertices[i].Y, this));
             //        else
-                        colors[i] = Geo.getVertexColor(f.Vertices[i], objShape, appState);
+                        colors[i] = Geo.getVertexColor(realFace.Vertices[i], objShape, appState);
             }
 
             var equalColor = new Color();
-            if (f.Vertices.Count >= 3)
+            if (realFace.Vertices.Count >= 3)
             {
                 equalColor.R = (byte)(((uint)colors[0].R + (uint)colors[1].R + (uint)colors[2].R) / 3);
                 equalColor.G = (byte)(((uint)colors[0].G + (uint)colors[1].G + (uint)colors[2].G) / 3);
@@ -310,7 +310,8 @@ namespace _3Dsimulator.Classes
                                     }
                                     else
                                     {
-                                        col = countColorVectorInterpolation(f, x, y, objShape.Io, objShape);
+                                        // Repair that shit
+                                        col = countColorVectorInterpolation(f, realFace, x, y, objShape.Io, objShape);
                                     }
 
                                     if(appState.Fog)
@@ -326,7 +327,7 @@ namespace _3Dsimulator.Classes
 
                                     if(appState.Night)
                                     {
-                                        col.A = 128;
+                                        col.A = (byte)(255 * appState.nocWspolczynnik);
                                     }
 
                                     bitmap.SetPixel(x, y, col);
@@ -471,7 +472,7 @@ namespace _3Dsimulator.Classes
                                     var a = 0;
                                     for (int x = (int)prev.xmin; x <= Math.Round(el.xmin); x++)
                                     {
-                                        c = countColorVectorInterpolation(f, x, y, objShape);
+                                        c = countColorVectorInterpolation(f, realFace, x, y, objShape);
                                         bitmap.SetPixel(x, y, c);
                                     }
                                 }
@@ -491,7 +492,7 @@ namespace _3Dsimulator.Classes
                 foreach (var f in loadedShape.Faces)
                 {
                     if (!appState.RotatingAllowed)
-                        FillFace(f, loadedShape);
+                        FillFace(f, f, loadedShape);
                 }
         }
 
@@ -525,6 +526,7 @@ namespace _3Dsimulator.Classes
                 foreach (var f in loadedShape.Faces)
                 {
                     Face curr_face = new Face();
+                    Face real_face = new Face();
                     var vc = f.Vertices.Count;
                     
                     for (int i = 0; i < vc; i++)
@@ -542,7 +544,11 @@ namespace _3Dsimulator.Classes
                             {
                                 fogValue = (v1x - appState.XC) * (v1x - appState.XC) +
                                     (v1y - appState.YC) * (v1y - appState.YC) + (v1z - appState.ZC) * (v1z - appState.ZC);
+                                fogValue *= appState.fogWspolczynnik;
                             }
+
+                            
+
 
                             Vector4 v1Start = new Vector4(v1x, v1y, v1z, 1);
                             Vector4 v2Start = new Vector4(v2x, v2y, v2z, 1);
@@ -559,6 +565,23 @@ namespace _3Dsimulator.Classes
                             if(appState.Vibrations)
                             {
                                 translate = Matrix4x4.CreateTranslation(new Vector3(xD, appState.translate + yD, zD));
+                            }
+
+                            if (loadedShape == mainShape)
+                            {
+                                //Vector4 v1Real = new Vector4((float)f.Edges[i].V1.X, (float)f.Edges[i].V1.Y, (float)f.Edges[i].V1.Z, 1);
+                                Vector4 v1Real = new Vector4(v1x, v1y, v1z, 1);
+                                Vector4 v1RealN = new Vector4((float)f.Edges[i].V1.normalVector.X, (float)f.Edges[i].V1.normalVector.Y,
+                                    (float)f.Edges[i].V1.normalVector.Z, 1);
+                                v1Real = Vector4.Transform(Vector4.Transform(v1Real, rotation), translate);
+                                v1RealN = Vector4.Transform(Vector4.Transform(v1RealN, rotation), translate);
+                                var realVertex = new Vertex(v1Real.X, v1Real.Y, v1Real.Z);
+                                realVertex.AddNormalVector(new NormalVector(v1RealN.X,v1RealN.Y,v1RealN.Z));
+                                real_face.Vertices.Add(realVertex);
+                            }
+                            else
+                            {
+                                real_face = f;
                             }
 
                             Vector3 cameraPosition = new Vector3(appState.XC, appState.YC, appState.ZC);
@@ -609,7 +632,7 @@ namespace _3Dsimulator.Classes
                                 // .
                                 // .
                                 // .
-                                // Albo i nie xD
+                                // Albo i nie xD 
                             }
 
                         }
@@ -627,7 +650,7 @@ namespace _3Dsimulator.Classes
                         curr_face.setAET();
                         curr_face.interpolateVectors();
                         
-                        FillFace(curr_face, loadedShape,
+                        FillFace(curr_face, real_face, loadedShape,
                             Color.FromRgb((byte)((ind * 50) % 256), (byte)((ind * 50) % 256), (byte)((ind * 50) % 256)), fogValue);
                     }
                 

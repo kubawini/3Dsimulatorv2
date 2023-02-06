@@ -61,13 +61,13 @@
                 <RadioButton GroupName="interpolation" Name="colorInterpolation" Grid.Row="1" Margin="5" Content="Cieniowanie Gourauda" Checked="colorInterpolation_Checked"/>
                 <RadioButton GroupName="interpolation" Name="vectorInterpolation" Grid.Row="2" Margin="5" Content="Cieniowanie Phonga" Checked="vectorInterpolation_Checked"/>
 
-                <CheckBox Name="fogCheckBox" Grid.Row="3" Margin="5" Content="Mgła"/>
-                <CheckBox Name="dayNightCheckbox" Grid.Row="4" Margin="5" Content="Dzień/Noc"/>
+                <CheckBox Name="fogCheckBox" Grid.Row="3" Margin="5" Content="Mgła" Click="fogCheckBox_Click"/>
+                <CheckBox Name="dayNightCheckbox" Grid.Row="4" Margin="5" Content="Dzień/Noc" Click="dayNightCheckbox_Click"/>
                 <CheckBox Name="vibrationsCheckbox" Grid.Row="5" Margin="5" Content="Drgania"/>
 
-                <RadioButton GroupName="camera" Name="camera1RadioButton" Grid.Row="6" Margin="5" Content="Kamera 1"/>
-                <RadioButton GroupName="camera" Name="camera2RadioButton" Grid.Row="7" Margin="5" Content="Kamera 2"/>
-                <RadioButton GroupName="camera" Name="camera3RadioButton" Grid.Row="8" Margin="5" Content="Kamera 3"/>
+                <RadioButton IsChecked="True" GroupName="camera" Name="camera1RadioButton" Grid.Row="6" Margin="5" Content="Kamera 1" Checked="camera1RadioButton_Checked" Click="camera1RadioButton_Click"/>
+                <RadioButton GroupName="camera" Name="camera2RadioButton" Grid.Row="7" Margin="5" Content="Kamera 2" Checked="camera2RadioButton_Checked" Click="camera2RadioButton_Click"/>
+                <RadioButton GroupName="camera" Name="camera3RadioButton" Grid.Row="8" Margin="5" Content="Kamera 3" Checked="camera3RadioButton_Checked" Click="camera3RadioButton_Click"/>
 
                 <Button Name="startButton" Grid.Row="9" Content="Start" Click="startButton_Click"/>
                 <!--<Grid Grid.Row="10" Grid.ColumnSpan="2">

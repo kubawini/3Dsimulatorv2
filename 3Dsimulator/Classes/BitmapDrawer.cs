@@ -181,7 +181,7 @@ namespace _3Dsimulator.Classes
 
             Vertex v = new Vertex(Geo.w2x(x), Geo.h2y(y), wv1 * Geo.p2z(f.Vertices[0].Z) + wv2 * Geo.p2z(f.Vertices[1].Z) + wv3 * Geo.p2z(f.Vertices[2].Z)); // To change z
             v.AddNormalVector(nv);
-            var c = Geo.getVertexColor(v, objShape, c1);
+            var c = Geo.getVertexColor(v, objShape, c1, appState);
             return c;
         }
 
@@ -196,7 +196,7 @@ namespace _3Dsimulator.Classes
 
             Vertex v = new Vertex(Geo.w2x(x), Geo.h2y(y), wv1 * Geo.p2z(f.Vertices[0].Z) + wv2 * Geo.p2z(f.Vertices[1].Z) + wv3 * Geo.p2z(f.Vertices[2].Z)); // To change z
             v.AddNormalVector(nv);
-            var c = Geo.getVertexColor(v, objShape, c1);
+            var c = Geo.getVertexColor(v, objShape, c1, appState);
             return c;
         }
 
@@ -234,7 +234,7 @@ namespace _3Dsimulator.Classes
             }
         }
 
-        public void FillFace(Face f, Vertex LightSource, ObjShape objShape, Color col = new Color())
+        public void FillFace(Face f, ObjShape objShape, Color col = new Color(), float fogValue = 0)
         {
             var colors = new Color[f.Vertices.Count];
             int y = (int)f.ymin;
@@ -259,7 +259,7 @@ namespace _3Dsimulator.Classes
             //            colors[i] = Geo.getVertexColor(f.Vertices[i], objShape, objShape.Io,
             //                Geo.modifyNormalVector(f.Vertices[i].normalVector, appState, (int)f.Vertices[i].X, (int)f.Vertices[i].Y, this));
             //        else
-                        colors[i] = Geo.getVertexColor(f.Vertices[i], objShape);
+                        colors[i] = Geo.getVertexColor(f.Vertices[i], objShape, appState);
             }
 
             var equalColor = new Color();
@@ -311,6 +311,22 @@ namespace _3Dsimulator.Classes
                                     else
                                     {
                                         col = countColorVectorInterpolation(f, x, y, objShape.Io, objShape);
+                                    }
+
+                                    if(appState.Fog)
+                                    {
+                                        int r = (int)(((int)col.R) + 255 * fogValue /4);
+                                        if (r > 255) r = 255;
+                                        int g = (int)(((int)col.G) + 255 * fogValue /4);
+                                        if (g > 255) g = 255;
+                                        int b = (int)(((int)col.B) + 255 * fogValue /4);
+                                        if (b > 255) b = 255;
+                                        col = Color.FromRgb((byte)r, (byte)g, (byte)b);
+                                    }
+
+                                    if(appState.Night)
+                                    {
+                                        col.A = 128;
                                     }
 
                                     bitmap.SetPixel(x, y, col);
@@ -475,7 +491,7 @@ namespace _3Dsimulator.Classes
                 foreach (var f in loadedShape.Faces)
                 {
                     if (!appState.RotatingAllowed)
-                        FillFace(f, loadedShape.lightSource, loadedShape);
+                        FillFace(f, loadedShape);
                 }
         }
 
@@ -495,9 +511,14 @@ namespace _3Dsimulator.Classes
                 }
             }
 
-
+            // Drgania
+            var r = new Random();
+            float xD = ((float)(r.Next() % 500)) / 10000 - 0.025f;
+            float yD = ((float)(r.Next() % 500)) / 10000 - 0.025f;
+            float zD = ((float)(r.Next() % 500)) / 10000 - 0.025f;
 
             int ind = 0;
+            float fogValue = 0;
             foreach (var loadedShape in loadedShapes)
             {
                 ind++;
@@ -505,6 +526,7 @@ namespace _3Dsimulator.Classes
                 {
                     Face curr_face = new Face();
                     var vc = f.Vertices.Count;
+                    
                     for (int i = 0; i < vc; i++)
                     {
                         if (appState.RotatingAllowed)
@@ -515,6 +537,12 @@ namespace _3Dsimulator.Classes
                             float v2x = (float)(f.Edges[i].V2.X - size / 2) * 2 / size;
                             float v2y = (float)(f.Edges[i].V2.Y - size / 2) * 2 / size;
                             float v2z = (float)f.Edges[i].V2.Z * 2 / size;
+
+                            if (i == 0)
+                            {
+                                fogValue = (v1x - appState.XC) * (v1x - appState.XC) +
+                                    (v1y - appState.YC) * (v1y - appState.YC) + (v1z - appState.ZC) * (v1z - appState.ZC);
+                            }
 
                             Vector4 v1Start = new Vector4(v1x, v1y, v1z, 1);
                             Vector4 v2Start = new Vector4(v2x, v2y, v2z, 1);
@@ -528,9 +556,24 @@ namespace _3Dsimulator.Classes
 
                             Matrix4x4 translate = Matrix4x4.CreateTranslation(new Vector3(0, appState.translate, 0));
 
+                            if(appState.Vibrations)
+                            {
+                                translate = Matrix4x4.CreateTranslation(new Vector3(xD, appState.translate + yD, zD));
+                            }
+
                             Vector3 cameraPosition = new Vector3(appState.XC, appState.YC, appState.ZC);
                             Vector3 cameraTarget = new Vector3(0, 0, 0);
                             Vector3 cameraUp = new Vector3(0, 0, 1);
+                            if(appState.Camera == 2)
+                            {
+                                cameraPosition = new Vector3(0, 0.5f, 0.2f);
+                                cameraTarget = new Vector3(0, appState.translate, 0);
+                            }
+                            else if(appState.Camera == 3)
+                            {
+                                cameraPosition = new Vector3(0, appState.translate - 0.5f, 1);
+                                cameraTarget = new Vector3(0, appState.translate + 0.5f, 0);
+                            }
                             Matrix4x4 view = Matrix4x4.CreateLookAt(cameraPosition, cameraTarget, cameraUp);
 
                             Matrix4x4 projection = Matrix4x4.CreatePerspectiveFieldOfView(appState.Fov, 1, 100, 1500);
@@ -553,8 +596,8 @@ namespace _3Dsimulator.Classes
 
                             if (v1_x < 600 && v1_x > 0 && v1_y < 600 && v1_y > 0 && v2_x < 600 && v2_x > 0 && v2_y < 600 && v2_y > 0)
                             {
-                                if (!appState.PaintingAllowed)
-                                    bitmap.DrawLine(v1_x, v1_y, v2_x, v2_y, Colors.Black);
+                                //if (!appState.PaintingAllowed)
+                               //     bitmap.DrawLine(v1_x, v1_y, v2_x, v2_y, Colors.Black);
                                 Vertex v = new Vertex(v1End.X, -v1End.Y, v1End.Z);
                                 v.normalVector = new NormalVector(normalVectorEnd.X, normalVectorEnd.Y, normalVectorEnd.Z);
                                 curr_face.AddVertex(v);
@@ -583,8 +626,9 @@ namespace _3Dsimulator.Classes
                         curr_face.CreateEdges();
                         curr_face.setAET();
                         curr_face.interpolateVectors();
-                        FillFace(curr_face, loadedShape.lightSource, loadedShape,
-                            Color.FromRgb((byte)((ind * 50) % 256), (byte)((ind * 50) % 256), (byte)((ind * 50) % 256)));
+                        
+                        FillFace(curr_face, loadedShape,
+                            Color.FromRgb((byte)((ind * 50) % 256), (byte)((ind * 50) % 256), (byte)((ind * 50) % 256)), fogValue);
                     }
                 
             

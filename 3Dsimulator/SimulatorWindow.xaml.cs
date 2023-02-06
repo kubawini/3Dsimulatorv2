@@ -121,6 +121,21 @@ namespace _3Dsimulator
             equalInterpolationBinding.Mode = BindingMode.TwoWay;
             equalInterpolation.SetBinding(RadioButton.IsCheckedProperty, equalInterpolationBinding);
 
+            var vibrationsBinding = new Binding("Vibrations");
+            vibrationsBinding.Source = appState;
+            vibrationsBinding.Mode = BindingMode.TwoWay;
+            vibrationsCheckbox.SetBinding(CheckBox.IsCheckedProperty, vibrationsBinding);
+
+            var fogBinding = new Binding("Fog");
+            fogBinding.Source = appState;
+            fogBinding.Mode = BindingMode.TwoWay;
+            fogCheckBox.SetBinding(CheckBox.IsCheckedProperty, fogBinding);
+
+            var nightBinding = new Binding("Night");
+            nightBinding.Source = appState;
+            nightBinding.Mode = BindingMode.TwoWay;
+            dayNightCheckbox.SetBinding(CheckBox.IsCheckedProperty, nightBinding);
+
             //var textureBinding = new Binding("TextureEnabled");
             //textureBinding.Source = appState;
             //textureBinding.Mode = BindingMode.TwoWay;
@@ -183,7 +198,7 @@ namespace _3Dsimulator
         {
             appState.kat += 0.1f;
             appState.translate += 0.02f * roadInt;
-            if (Math.Abs(appState.translate) >= 0.5)
+            if (Math.Abs(appState.translate) >= 0.4)
                 roadInt *= -1;
             drawer.draw();
         }
@@ -319,6 +334,59 @@ namespace _3Dsimulator
         private void startButton_Click(object sender, RoutedEventArgs e)
         {
             rotateTimer.Start();
+        }
+
+
+
+        private void camera1RadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void camera2RadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void camera3RadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void camera1RadioButton_Click(object sender, RoutedEventArgs e)
+        {
+            appState.Camera = 1;
+            appState.XC = 0.3f;
+            appState.YC = 0.5f;
+            appState.ZC = 0.2f;
+            drawer.draw();
+        }
+
+        private void camera2RadioButton_Click(object sender, RoutedEventArgs e)
+        {
+            appState.Camera = 2;
+            appState.XC = 0;
+            appState.YC = 0.5f;
+            appState.ZC = 0.2f;
+            drawer.draw();
+        }
+
+        private void camera3RadioButton_Click(object sender, RoutedEventArgs e)
+        {
+            appState.Camera = 3;
+            appState.XC = 0;
+            appState.YC = appState.translate - 0.5f;
+            appState.ZC = 1;
+            drawer.draw();
+        }
+
+        private void fogCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            drawer.draw();
+        }
+
+        private void dayNightCheckbox_Click(object sender, RoutedEventArgs e)
+        {
+            drawer.draw();
         }
     }
 }

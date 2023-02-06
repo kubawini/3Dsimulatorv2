@@ -78,6 +78,17 @@ namespace _3Dsimulator.Classes
         public WriteableBitmap Texture = null; // To add default
         public System.Windows.Media.Color[,] TextureColors;
 
+        private int camera = 1;
+        public int Camera { get { return camera; } set { camera = value; OnPropertyChanged(); } }
+
+        private bool vibrations = false;
+        public bool Vibrations { get { return vibrations; } set { vibrations = value; OnPropertyChanged();} }
+
+        private bool fog = false;
+        public bool Fog { get { return fog; } set { fog = value; OnPropertyChanged();} }
+
+        private bool night = false;
+        public bool Night { get { return night; } set { night = value; OnPropertyChanged(); } }
 
         public WriteableBitmap NormalMap = null; // To add default
 

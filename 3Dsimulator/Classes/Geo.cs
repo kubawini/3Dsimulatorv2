@@ -69,49 +69,68 @@ namespace _3Dsimulator.Classes
             return nv;
         }
 
-        public static Color getVertexColor(Vertex v, ObjShape os, Color c, NormalVector nv)
+        public static Color getVertexColor(Vertex v, ObjShape os, Color c, NormalVector nv, AppState appState)
         {
-            var xL = os.lightSource.X - v.X;
-            var yL = os.lightSource.Y - v.Y;
-            var zL = os.lightSource.Z - v.Z;
-            var len = Math.Sqrt(xL*xL + yL*yL + zL*zL);
-
-            NormalVector L = new NormalVector(xL / len, yL / len, zL / len);
-            var cosNL = nv.X * L.X + nv.Y * L.Y + nv.Z * L.Z;
-
-            if (cosNL < 0) cosNL = 0;
-
-            var V = new NormalVector(0, 0, 1);
-            var R = new NormalVector(2 * cosNL * nv.X -L.X,2 * cosNL * nv.Y -L.Y, 2 * cosNL * nv.Z - L.Z); // I change
-            var lenR = Math.Sqrt(R.X*R.X + R.Y * R.Y + R.Z*R.Z);
-            var cosVR = R.Z / lenR;
+            double Red = 0;
+            double Green = 0;
+            double Blue = 0;
+            byte bRed = 0;
+            byte bGreen = 0;
+            byte bBlue = 0;
             
-            if (cosVR < 0) cosVR = 0;
-            var Red = ((os.Il.R * c.R/ 255) * (os.kd * cosNL + os.ks * Math.Pow(cosVR, os.m)));
-            var bRed = (byte)Red;
-            if(Red > 255) bRed = 255;
-            var Green = ((os.Il.G * c.G / 255) * (os.kd * cosNL + os.ks * Math.Pow(cosVR, os.m)));
-            var bGreen = (byte)Green;
-            if (Green > 255) bGreen = 255;
-            var Blue = ((os.Il.B * c.B / 255) * (os.kd * cosNL + os.ks * Math.Pow(cosVR, os.m)));
-            var bBlue = (byte)Blue;
-            if (Blue > 255) bBlue = 255;
+            foreach (var ls in os.lightSources)
+            {
+                var xL = ls.X - v.X;
+                var yL = ls.Y - v.Y;
+                var zL = ls.Z - v.Z;
+                var len = Math.Sqrt(xL * xL + yL * yL + zL * zL);
+
+                NormalVector L = new NormalVector(xL / len, yL / len, zL / len);
+                var cosNL = nv.X * L.X + nv.Y * L.Y + nv.Z * L.Z;
+
+                if (cosNL < 0) cosNL = 0;
+
+                var V = new NormalVector(0, 0, 1);
+                //var vx = appState.XC - v.X;
+                //var vy = appState.YC - v.Y;
+                //var vz = appState.ZC - v.Z;
+                //var norm = vx*vx+ vy*vy + vz*vz;
+
+
+                //var V = new NormalVector(vx / norm, vy / norm, vz / norm);
+                var R = new NormalVector(2 * cosNL * nv.X - L.X, 2 * cosNL * nv.Y - L.Y, 2 * cosNL * nv.Z - L.Z); // I change
+                var lenR = Math.Sqrt(R.X * R.X + R.Y * R.Y + R.Z * R.Z);
+                var cosVR = R.Z / lenR;
+                //var cosVR = v.X * R.X + v.Y * L.Y + v.Z * R.Z;
+
+                if (cosVR < 0) cosVR = 0;
+                Red += ((os.Il.R * c.R / 255) * (os.kd * cosNL + os.ks * Math.Pow(cosVR, os.m)));
+                if (Red > 255) bRed = 255;
+                Green += ((os.Il.G * c.G / 255) * (os.kd * cosNL + os.ks * Math.Pow(cosVR, os.m)));
+                if (Green > 255) bGreen = 255;
+                Blue += ((os.Il.B * c.B / 255) * (os.kd * cosNL + os.ks * Math.Pow(cosVR, os.m)));
+                if (Blue > 255) bBlue = 255;
+            }
+
+            bRed = (byte)Red;
+            bGreen = (byte)Green;
+            bBlue = (byte)Blue;
             return Color.FromRgb(bRed, bGreen, bBlue);
         }
 
-        public static Color getVertexColor(Vertex v, ObjShape os, NormalVector nv)
+        public static Color getVertexColor(Vertex v, ObjShape os, NormalVector nv, AppState appState)
         {
-            return getVertexColor(v, os, os.Io, nv);
+            return getVertexColor(v, os, os.Io, nv, appState);
         }
 
-        public static Color getVertexColor(Vertex v, ObjShape os, Color c)
+        public static Color getVertexColor(Vertex v, ObjShape os, Color c, AppState appState)
         {
-            return getVertexColor(v, os, c, v.normalVector);
+            return getVertexColor(v, os, c, v.normalVector, appState);
         }
 
-        public static Color getVertexColor(Vertex v, ObjShape os)
+        public static Color getVertexColor(Vertex v, ObjShape os, AppState appState)
         {
-            return getVertexColor(v, os, os.Io, v.normalVector);
+            return getVertexColor(v, os, os.Io, v.normalVector, appState);
         }
     }
 }

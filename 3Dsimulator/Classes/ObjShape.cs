@@ -26,7 +26,7 @@ namespace _3Dsimulator.Classes
         private System.Windows.Media.Color _Il = Colors.White;
         private System.Windows.Media.Color _Io = Colors.Red;
         private double _m = 10;
-        private Vertex _lightSource = new Vertex(0, 0, 2);
+        private List<LightSource> _lightSources = new List<LightSource>();
         private double _r = 0;
 
 
@@ -35,11 +35,15 @@ namespace _3Dsimulator.Classes
         public double m { get { return _m; } set { _m = value; } }
         public System.Windows.Media.Color Il { get { return _Il; } set { _Il = value; } }
         public System.Windows.Media.Color Io { get { return _Io; } set { _Io = value; } }
-        public Vertex lightSource { get { return _lightSource; } set { _lightSource = value; } }
-        public double z { get { return _lightSource.Z; } set {  _lightSource.Z = value; } }
+        public List<LightSource> lightSources { get { return _lightSources; } set { _lightSources = value; } }
+        //public double z { get { return _lightSource.Z; } set {  _lightSource.Z = value; } } // Commented for now
         public double r { get { return _r; } set { _r = value; } }
 
-
+        public ObjShape()
+        {
+            _lightSources.Add(new LightSource(0, 0, 2));
+            //_lightSources.Add(new LightSource(2000, 2000, 0));
+        }
 
         public void AddVertex(Vertex v)
         {

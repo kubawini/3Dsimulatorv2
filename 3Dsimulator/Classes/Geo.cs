@@ -112,6 +112,42 @@ namespace _3Dsimulator.Classes
                 if (Blue > 255) Blue = 255;
             }
 
+            // Moving light section
+            if(((appState.lightVector * (v-appState.lightVertex))/((v-appState.lightVertex).Length*appState.lightVector.Length))
+                >=0)
+            {
+                var xL = appState.lightX - v.X;
+                var yL = appState.lightY - v.Y;
+                var zL = appState.lightZ - v.Z;
+                var len = Math.Sqrt(xL * xL + yL * yL + zL * zL);
+
+                NormalVector L = new NormalVector(xL / len, yL / len, zL / len);
+                var cosNL = nv.X * L.X + nv.Y * L.Y + nv.Z * L.Z;
+
+                if (cosNL < 0) cosNL = 0;
+
+                var V = new NormalVector(0, 0, 1);
+                //var vx = appState.XC - v.X;
+                //var vy = appState.YC - v.Y;
+                //var vz = appState.ZC - v.Z;
+                //var norm = vx*vx+ vy*vy + vz*vz;
+
+
+                //var V = new NormalVector(vx / norm, vy / norm, vz / norm);
+                var R = new NormalVector(2 * cosNL * nv.X - L.X, 2 * cosNL * nv.Y - L.Y, 2 * cosNL * nv.Z - L.Z); // I change
+                var lenR = Math.Sqrt(R.X * R.X + R.Y * R.Y + R.Z * R.Z);
+                var cosVR = R.Z / lenR;
+                //var cosVR = v.X * R.X + v.Y * L.Y + v.Z * R.Z;
+
+                if (cosVR < 0) cosVR = 0;
+                Red += ((os.Il.R * c.R / 255) * (os.kd * cosNL + os.ks * Math.Pow(cosVR, os.m)));
+                if (Red > 255) Red = 255;
+                Green += ((os.Il.G * c.G / 255) * (os.kd * cosNL + os.ks * Math.Pow(cosVR, os.m)));
+                if (Green > 255) Green = 255;
+                Blue += ((os.Il.B * c.B / 255) * (os.kd * cosNL + os.ks * Math.Pow(cosVR, os.m)));
+                if (Blue > 255) Blue = 255;
+            }
+
             bRed = (byte)Red;
             bGreen = (byte)Green;
             bBlue = (byte)Blue;

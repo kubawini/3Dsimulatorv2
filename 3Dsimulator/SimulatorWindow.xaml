@@ -26,8 +26,8 @@
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
                     <!--<RowDefinition Height="40"/>
-                    <RowDefinition Height="40"/>
                     <RowDefinition Height="*"/>-->
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
@@ -69,7 +69,9 @@
                 <RadioButton GroupName="camera" Name="camera2RadioButton" Grid.Row="7" Margin="5" Content="Kamera 2" Checked="camera2RadioButton_Checked" Click="camera2RadioButton_Click"/>
                 <RadioButton GroupName="camera" Name="camera3RadioButton" Grid.Row="8" Margin="5" Content="Kamera 3" Checked="camera3RadioButton_Checked" Click="camera3RadioButton_Click"/>
 
-                <Button Name="startButton" Grid.Row="9" Content="Start" Click="startButton_Click"/>
+                <Slider Name="lightSlider" Grid.Row="9" Minimum="-1" Maximum="1" Margin="5"/>
+                
+                <Button Name="startButton" Grid.Row="10" Content="Start" Click="startButton_Click"/>
                 <!--<Grid Grid.Row="10" Grid.ColumnSpan="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>

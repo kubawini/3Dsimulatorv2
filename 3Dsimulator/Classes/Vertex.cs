@@ -25,5 +25,12 @@ namespace _3Dsimulator.Classes
         {
             normalVector = nv;
         }
+
+        public static NormalVector operator-(Vertex v1, Vertex v2)
+        {
+            return new(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);
+        }
+
+
     }
 }

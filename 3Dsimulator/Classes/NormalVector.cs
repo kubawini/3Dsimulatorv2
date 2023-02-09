@@ -16,5 +16,23 @@ namespace _3Dsimulator.Classes
         {
             X = x; Y = y; Z = z;
         }
+
+        public static double operator*(NormalVector v1, NormalVector v2)
+        {
+            return v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z;
+        }
+
+        public double Length
+        {
+            get
+            {
+                return Math.Sqrt(X * X + Y * Y + Z * Z);
+            }
+        }
+
+        public static NormalVector operator/(NormalVector v, double d)
+        {
+            return new(v.X / d, v.Y / d, v.Z / d);
+        }
     }
 }

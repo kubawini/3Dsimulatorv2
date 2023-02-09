@@ -98,6 +98,23 @@ namespace _3Dsimulator.Classes
         public float fogSign = 1;
         public float nocSign = 1;
 
+        private float lightDirection = 0;
+        public float LightDirection { get { return lightDirection; } set { lightDirection = value; OnPropertyChanged();} }
+
+        public float lightX { get { return 0 ; } }
+        public float lightY { get { return translate + (float)Math.Cos(kat) / 4; } }
+        public float lightZ { get { return (float)Math.Sin(kat)*(-1); } }
+        public Vertex lightVertex { 
+            get 
+            { 
+                var v = new Vertex(lightX, lightY, lightZ);
+                v.X -= 300;
+                return v;
+            } 
+        }
+        public NormalVector lightVector { get { return new NormalVector(0, Math.Cos(kat), -Math.Sin(kat)); } }
+        public float Beta = 1.3f;
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
